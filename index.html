@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#140d28">
+<title>Circuit Workspace</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="shared/style.css">
+<!-- Локализация подключается в <head>, а не в конце <body>: перевод должен
+     примениться до первой отрисовки, иначе при неруском языке на кадр
+     мелькает русская разметка. -->
+<script src="shared/i18n.js"></script>
+<script src="shared/i18n/common.js"></script>
+<script src="shared/backup.js"></script>
+<style>
+  .cw-hub-header {
+    position: relative;
+    z-index: 1;
+    padding: 48px 0 28px;
+  }
+  .cw-hub-header::before {
+    content: "";
+    position: absolute;
+    top: -60px; left: 8%;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, var(--cw-lavender) 0%, transparent 70%);
+    opacity: 0.14;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .cw-hub-header__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cw-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cw-logo__mark {
+    width: 40px; height: 40px;
+    flex-shrink: 0;
+  }
+  .cw-logo__text {
+    font-family: var(--md-font-family);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .cw-logo__text span { color: var(--cw-lavender); }
+  .cw-hub-header h1 {
+    font-family: var(--md-font-family);
+    font-size: clamp(28px, 4vw, 36px);
+    line-height: 1.22;
+    font-weight: 400;
+    margin: 28px 0 8px;
+    letter-spacing: 0;
+  }
+  .cw-hub-header p {
+    color: var(--cw-text-dim);
+    font: 400 16px/24px var(--md-font-family);
+    letter-spacing: 0.5px;
+    max-width: 56ch;
+    margin: 0;
+  }
+  .cw-version {
+    font: 500 12px/16px var(--md-font-family);
+    letter-spacing: 0.5px;
+    color: var(--cw-muted);
+    border: 1px solid var(--cw-line);
+    background: var(--cw-surface);
+    border-radius: 999px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+
+  /* --- Переключатель языка -------------------------------------------
+     Нативный <select>: на мобильных он открывает системный список выбора,
+     который удобнее и доступнее любого самописного меню. Стилизуем только
+     оболочку, стрелку рисуем сами (штатная стрелка не наследует цвет). */
+  .cw-hub-header__tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cw-lang {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .cw-lang__icon {
+    position: absolute;
+    left: 10px;
+    width: 16px; height: 16px;
+    pointer-events: none;
+    color: var(--cw-muted);
+  }
+  .cw-lang__select {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 32px;
+    padding: 0 28px 0 32px;
+    border: 1px solid var(--cw-line);
+    border-radius: 999px;
+    background: var(--cw-surface);
+    color: var(--cw-text);
+    font: 500 12px/16px var(--md-font-family);
+    letter-spacing: 0.5px;
+    cursor: pointer;
+  }
+  .cw-lang__select:hover { border-color: var(--cw-violet-dim); }
+  .cw-lang__select:focus-visible {
+    outline: 3px solid var(--cw-lavender);
+    outline-offset: 2px;
+  }
+  /* Список опций рисует ОС — на тёмном фоне системная палитра может дать
+     белый текст на белом. Задаём цвета явно. */
+  .cw-lang__select option { background: var(--cw-bg-raised); color: var(--cw-text); }
+  .cw-lang__arrow {
+    position: absolute;
+    right: 10px;
+    width: 12px; height: 12px;
+    pointer-events: none;
+    color: var(--cw-muted);
+  }
+
+  /* --- Плата модулей: шина-коннектор + плитки ---
+     Каждая плитка "запитана" от общей шины сверху: горизонтальная линия
+     соединяет три контактные площадки (pad), от каждой вниз идёт дорожка
+     к соответствующей плитке. Цвет площадки отражает статус модуля. */
+  .cw-board {
+    position: relative;
+    z-index: 1;
+    padding: 12px 0 64px;
+
+    /* Число колонок и зазор объявлены ОДИН раз и используются и сеткой,
+       и шиной-коннектором. Раньше площадки шины стояли на 16,666%/50%/
+       83,333%, а реальные центры колонок из-за зазора приходятся на
+       15,76%/50%/84,24% — крайние дорожки всегда промахивались мимо
+       плиток ровно на gap/3 (≈9px). Теперь шина — такая же сетка, и
+       попадание в центр обеспечено на любой ширине и при любом числе
+       модулей. */
+    --cw-cols: 4;
+    --cw-gap: 28px;
+  }
+  /* Ступени рассчитаны от читаемой ширины плитки (~230px минимум с учётом
+     зазора), а не от числа модулей: четыре в ряд имеют смысл только на
+     широком экране, ниже 1240px плитки сжимались бы до нечитаемых. */
+  @media (max-width: 1240px) { .cw-board { --cw-cols: 3; } }
+  @media (max-width: 1000px) { .cw-board { --cw-cols: 2; } }
+  @media (max-width: 700px)  { .cw-board { --cw-cols: 1; } }
+
+  .cw-bus {
+    display: grid;
+    grid-template-columns: repeat(var(--cw-cols), minmax(0, 1fr));
+    gap: var(--cw-gap);
+    height: 32px;
+    margin-bottom: 2px;
+  }
+  /* Шина осмысленна только когда все модули стоят в один ряд. Порог
+     совпадает с первой ступенью сетки: как только колонок стало меньше,
+     чем модулей, дорожки уже никуда не ведут. */
+  @media (max-width: 1240px) { .cw-bus { display: none; } }
+
+  .cw-bus__cell { position: relative; }
+  .cw-bus__cell::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--cw-line);
+  }
+  /* Крайние ячейки: линия доходит только до своей площадки, а не торчит
+     за пределы крайних плиток. */
+  .cw-bus__cell:first-child::before { left: 50%; }
+  .cw-bus__cell:last-child::before  { right: 50%; }
+
+  .cw-bus__pad {
+    position: absolute;
+    top: -7px; left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--cw-bg-raised);
+    border: 2px solid var(--cw-line);
+  }
+  .cw-bus__pad::after {
+    content: "";
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: 23px;
+    background: var(--cw-line);
+  }
+  .cw-bus__pad--live { border-color: var(--cw-violet); background: var(--cw-violet-dim); }
+  .cw-bus__pad--live::after { background: var(--cw-violet-dim); }
+
+  .cw-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--cw-cols), minmax(0, 1fr));
+    gap: var(--cw-gap);
+    align-items: stretch;
+  }
+
+  /* Гридовый элемент — ссылка, а карточка лежит внутри неё. При
+     display:block карточка не тянулась до высоты строки, и плитки
+     расходились по высоте на величину лишней строки описания (~20px).
+     flex + flex:1 растягивает карточку на всю ячейку. */
+  .cw-tile-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    border-radius: var(--cw-radius);
+  }
+  .cw-tile-link:focus-visible {
+    outline: 3px solid var(--cw-lavender);
+    outline-offset: 3px;
+  }
+
+  .cw-tile {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* Все отступы кратны 4px (шаг MD3): было 26/18/6/18 вразнобой. */
+    padding: 24px;
+    min-height: 200px;
+  }
+  .cw-tile__icon {
+    width: 48px; height: 48px;
+    /* Радиус из фирменной шкалы, а не из MD3: карточка тоже на ней
+       (--cw-radius), смешение двух шкал давало разный «характер» углов. */
+    border-radius: var(--cw-radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--cw-surface-2);
+    border: 1px solid var(--cw-line);
+    margin-bottom: 16px;
+    color: var(--cw-violet);
+  }
+  /* Цвет иконки наследуется от .cw-tile__icon (currentColor в разметке),
+     а не задаётся хексом в каждом <svg> — тема остаётся управляемой. */
+  .cw-tile__icon svg { width: 24px; height: 24px; }
+  .cw-tile h2 {
+    font: 500 16px/24px var(--md-font-family);
+    letter-spacing: 0.15px;
+    margin: 0 0 8px;
+  }
+  .cw-tile p {
+    color: var(--cw-text-dim);
+    font: 400 14px/20px var(--md-font-family);
+    letter-spacing: 0.25px;
+    margin: 0 0 16px;
+    flex: 1 1 auto;
+  }
+  .cw-tile__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .cw-tile__badge { display: inline-flex; align-items: center; gap: 6px; }
+  .cw-tile__dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: 0 0 auto;
+  }
+  .cw-tile__ver { opacity: 0.75; font-variant-numeric: tabular-nums; }
+
+  /* Подъём карточки — только там, где есть настоящий курсор: на тач-экране
+     :hover «залипает» после тапа и плитка остаётся приподнятой. */
+  @media (hover: none) {
+    .cw-tile-link .cw-card:hover {
+      transform: none;
+      box-shadow: var(--cw-shadow-sm);
+      border-color: var(--cw-line);
+    }
+  }
+  /* Видимый фокус для навигации с клавиатуры: раньше плитки фокусировались
+     без какого-либо визуального отклика. */
+  .cw-tile-link:focus-visible {
+    outline: 3px solid var(--cw-lavender);
+    outline-offset: 3px;
+  }
+
+  /* Подпись селекта нужна скринридеру, но визуально её роль выполняет
+     иконка глобуса. */
+  .cw-sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* --- Резервное копирование ------------------------------------------
+     Отдельная карточка под плитками: это не модуль, а действие над всем
+     рабочим пространством, и его место — рядом с модулями, но не среди них. */
+  .cw-backup { margin-top: 40px; }
+  .cw-backup__head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .cw-backup__head h2 {
+    font: 500 16px/24px var(--md-font-family);
+    letter-spacing: 0.15px; margin: 0;
+  }
+  .cw-backup__hint { color: var(--cw-text-dim); font: 400 13px/20px var(--md-font-family); margin: 0 0 16px; }
+  .cw-backup__actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .cw-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 18px;
+    border-radius: 999px; border: 1px solid var(--cw-line);
+    background: var(--cw-surface); color: var(--cw-text);
+    font: 500 14px/20px var(--md-font-family); cursor: pointer;
+  }
+  .cw-btn:hover { border-color: var(--cw-violet-dim); }
+  .cw-btn:focus-visible { outline: 3px solid var(--cw-lavender); outline-offset: 2px; }
+  .cw-btn--primary { background: var(--cw-violet); border-color: var(--cw-violet); color: #fff; }
+  .cw-btn svg { width: 18px; height: 18px; }
+  .cw-backup__table { width: 100%; border-collapse: collapse; font: 400 13px/20px var(--md-font-family); }
+  .cw-backup__table th {
+    text-align: left; color: var(--cw-muted); font-weight: 500;
+    padding: 6px 8px; border-bottom: 1px solid var(--cw-line);
+  }
+  .cw-backup__table td { padding: 8px; border-bottom: 1px solid var(--cw-line); }
+  .cw-backup__table td:last-child, .cw-backup__table th:last-child { text-align: right; white-space: nowrap; }
+  .cw-backup__never { color: var(--cw-muted); }
+  .cw-backup__status { margin: 12px 0 0; font: 400 13px/20px var(--md-font-family); color: var(--cw-text-dim); min-height: 20px; }
+
+  .cw-footer {
+    position: relative; z-index: 1;
+    padding: 24px 0 48px;
+    text-align: center;
+    color: var(--cw-muted);
+    font-size: 12.5px;
+  }
+</style>
+</head>
+<body class="cw-root">
+<div class="cw-board-bg" aria-hidden="true"></div>
+
+<header class="cw-hub-header">
+  <div class="cw-container">
+    <div class="cw-hub-header__top">
+      <div class="cw-logo">
+        <svg class="cw-logo__mark" viewBox="0 0 40 40" aria-hidden="true">
+          <g stroke="#8a5cf6" stroke-width="1.6" stroke-linecap="round">
+            <line x1="20" y1="20" x2="20" y2="10.9"/>
+            <line x1="20" y1="20" x2="27.9" y2="15.4"/>
+            <line x1="20" y1="20" x2="27.9" y2="24.6"/>
+            <line x1="20" y1="20" x2="20" y2="29.1"/>
+            <line x1="20" y1="20" x2="12.1" y2="24.6"/>
+            <line x1="20" y1="20" x2="12.1" y2="15.4"/>
+          </g>
+          <circle cx="20" cy="10.9" r="2.6" fill="#c9a3ff"/>
+          <circle cx="27.9" cy="15.4" r="2.6" fill="#4be0d0"/>
+          <circle cx="27.9" cy="24.6" r="2.6" fill="#c9a3ff"/>
+          <circle cx="20" cy="29.1" r="2.6" fill="#4be0d0"/>
+          <circle cx="12.1" cy="24.6" r="2.6" fill="#c9a3ff"/>
+          <circle cx="12.1" cy="15.4" r="2.6" fill="#4be0d0"/>
+          <circle cx="20" cy="20" r="4.5" fill="#f1eefb"/>
+        </svg>
+        <span class="cw-logo__text">Circuit<span>Workspace</span></span>
+      </div>
+      <div class="cw-hub-header__tools">
+        <span class="cw-lang">
+          <svg class="cw-lang__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/></svg>
+          <label class="cw-sr-only" for="hubLanguage" data-i18n="hub.language_label">Язык интерфейса</label>
+          <select class="cw-lang__select" id="hubLanguage" data-i18n-title="hub.language_label"></select>
+          <svg class="cw-lang__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <span class="cw-version cw-mono" id="hubVersion" data-i18n-title="hub.version_label">v…</span>
+      </div>
+    </div>
+    <h1 data-i18n="hub.title">Один вход для всех инструментов района</h1>
+    <p data-i18n="hub.subtitle">Каждая плитка — самостоятельный модуль. Общие данные вводятся один раз и постепенно становятся доступны во всех модулях.</p>
+  </div>
+</header>
+
+<main class="cw-board">
+  <div class="cw-container">
+    <!-- Ячеек ровно столько же, сколько плиток: площадка каждой ячейки
+         центрируется гридом, а не процентами. -->
+    <div class="cw-bus" aria-hidden="true">
+      <div class="cw-bus__cell"><span class="cw-bus__pad cw-bus__pad--live"></span></div>
+      <div class="cw-bus__cell"><span class="cw-bus__pad cw-bus__pad--live"></span></div>
+      <div class="cw-bus__cell"><span class="cw-bus__pad cw-bus__pad--live"></span></div>
+      <div class="cw-bus__cell"><span class="cw-bus__pad cw-bus__pad--live"></span></div>
+    </div>
+    <div class="cw-grid" id="moduleGrid">
+
+      <a class="cw-tile-link" href="congress-project/index.html" data-module="congress-project">
+        <article class="cw-card cw-tile">
+          <div class="cw-tile__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16v12H4z"/><path d="M8 20h8M9 16v4M15 16v4"/></svg>
+          </div>
+          <h2 data-i18n="module.congress-project.title">Конгрессы</h2>
+          <p data-i18n="module.congress-project.desc">Программа конгрессов, распределение заданий и генерация писем участникам в PDF.</p>
+          <div class="cw-tile__footer">
+            <span class="cw-badge cw-badge--live cw-tile__badge">
+              <span class="cw-tile__dot" aria-hidden="true"></span>
+              <span data-i18n="status.live">работает</span>
+              <span class="cw-tile__ver" data-module-version></span>
+            </span>
+          </div>
+        </article>
+      </a>
+
+      <a class="cw-tile-link" href="circuit-planner/index.html" data-module="circuit-planner">
+        <article class="cw-card cw-tile">
+          <div class="cw-tile__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          </div>
+          <h2 data-i18n="module.circuit-planner.title">Клиндарий</h2>
+          <p data-i18n="module.circuit-planner.desc">Календарь служебного года: недели, посещения, формуляры S-302 и печать PDF.</p>
+          <div class="cw-tile__footer">
+            <span class="cw-badge cw-badge--live cw-tile__badge">
+              <span class="cw-tile__dot" aria-hidden="true"></span>
+              <span data-i18n="status.live">работает</span>
+              <span class="cw-tile__ver" data-module-version></span>
+            </span>
+          </div>
+        </article>
+      </a>
+
+      <a class="cw-tile-link" href="pioneer-school/index.html" data-module="pioneer-school">
+        <article class="cw-card cw-tile">
+          <div class="cw-tile__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l9 5v8l-9 5-9-5V8z"/><path d="M12 12v9M3 8l9 4 9-4"/></svg>
+          </div>
+          <h2 data-i18n="module.pioneer-school.title">Школа пионеров</h2>
+          <p data-i18n="module.pioneer-school.desc">Учащиеся и классы, расписание уроков, учебники, формуляры S-253 и экспорт списков.</p>
+          <div class="cw-tile__footer">
+            <span class="cw-badge cw-badge--live cw-tile__badge">
+              <span class="cw-tile__dot" aria-hidden="true"></span>
+              <span data-i18n="status.live">работает</span>
+              <span class="cw-tile__ver" data-module-version></span>
+            </span>
+          </div>
+        </article>
+      </a>
+
+      <a class="cw-tile-link" href="appointments/index.html" data-module="appointments">
+        <article class="cw-card cw-tile">
+          <div class="cw-tile__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/><path d="m9 15 2 2 4-4"/></svg>
+          </div>
+          <h2 data-i18n="module.appointments.title">Назначения</h2>
+          <p data-i18n="module.appointments.desc">Письмо о назначении и вычёркивании старейшин и служителей собрания.</p>
+          <div class="cw-tile__footer">
+            <span class="cw-badge cw-badge--live cw-tile__badge">
+              <span class="cw-tile__dot" aria-hidden="true"></span>
+              <span data-i18n="status.live">работает</span>
+              <span class="cw-tile__ver" data-module-version></span>
+            </span>
+          </div>
+        </article>
+      </a>
+
+    </div>
+
+    <section class="cw-backup cw-card" aria-labelledby="backupHeading">
+      <div class="cw-backup__head">
+        <h2 id="backupHeading" data-i18n="backup.title">Резервное копирование</h2>
+      </div>
+      <p class="cw-backup__hint" data-i18n="backup.hint">Полная копия включает данные всех модулей и общие настройки — язык, отправителя и общую базу. PIN-код Клиндария в копию не входит.</p>
+      <div class="cw-backup__actions">
+        <button type="button" class="cw-btn cw-btn--primary" id="backupSaveAll">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <span data-i18n="backup.save_all">Сохранить всё</span>
+        </button>
+        <button type="button" class="cw-btn" id="backupRestoreBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M7 14l5-5 5 5"/><path d="M12 9v12"/></svg>
+          <span data-i18n="backup.restore">Восстановить из файла</span>
+        </button>
+        <input type="file" id="backupFile" accept=".json,application/json" hidden />
+      </div>
+      <table class="cw-backup__table">
+        <thead>
+          <tr>
+            <th data-i18n="backup.col_module">Модуль</th>
+            <th data-i18n="backup.col_version">Версия</th>
+            <th data-i18n="backup.col_last">Последняя копия</th>
+          </tr>
+        </thead>
+        <tbody id="backupRows"></tbody>
+      </table>
+      <p class="cw-backup__status" id="backupStatus" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+</main>
+
+<footer class="cw-footer">
+  <div class="cw-container">
+    <span data-i18n="hub.footer">Circuit Workspace · единая точка входа поверх независимых модулей</span>
+  </div>
+</footer>
+
+<script src="shared/version.js"></script>
+<script>
+  // Версия хаба — единственный источник: shared/version.js. Никогда не хардкодим
+  // номер версии в разметке, чтобы он не мог "отстать" при очередном обновлении.
+  document.getElementById('hubVersion').textContent = 'v' + self.CW_VERSION;
+
+  // Версии модулей — тоже из shared/version.js (self.CW_MODULES), а не из
+  // разметки: раньше номер на плитке приходилось править вручную, и он отставал
+  // от реальной версии модуля. Если версии в реестре нет — элемент остаётся
+  // пустым, а не показывает неверный номер.
+  // Важно: номер лежит в ОТДЕЛЬНОМ <span>, а не в тексте всего бейджа —
+  // иначе смена языка затирала бы версию, а простановка версии затирала бы
+  // перевод статуса.
+  Object.keys(self.CW_MODULES || {}).forEach(function (key) {
+    var tile = document.querySelector('[data-module="' + key + '"]');
+    if (!tile) return;
+    var slot = tile.querySelector('[data-module-version]');
+    var version = self.CW_MODULES[key].version;
+    if (slot && version) slot.textContent = '· v' + version;
+  });
+
+  // --- Язык интерфейса ------------------------------------------------
+  // Хаб задаёт язык по умолчанию для всей экосистемы: CWI18n.setLang здесь
+  // пишет общий ключ 'cw-lang'. Модуль, в котором пользователь язык не менял,
+  // подхватит его при следующем открытии; модуль с собственным выбором
+  // (ключ 'cw-lang:<module>') останется на своём — это и есть наследование
+  // с локальным переопределением.
+  (function () {
+    var select = document.getElementById('hubLanguage');
+
+    // Опции строим из реестра языков, а не из разметки: добавление языка =
+    // одна строка в shared/i18n.js + переводы, без правки HTML.
+    CWI18n.LANGS.forEach(function (lang) {
+      var option = document.createElement('option');
+      option.value = lang.code;
+      option.textContent = lang.label;
+      select.appendChild(option);
+    });
+
+    var active = CWI18n.init();   // без module → это хаб
+    select.value = active;
+
+    select.addEventListener('change', function (e) {
+      CWI18n.setLang(e.target.value);   // apply() внутри — перерисовка мгновенная
+    });
+
+    // Смена языка в другой вкладке (событие storage) — держим селект в курсе.
+    CWI18n.onChange(function (lang) { select.value = lang; });
+  })();
+
+  // Инициализируем общую БД заранее, чтобы модули, подключающие CWDB,
+  // не ждали первого открытия соединения.
+  if ('indexedDB' in window) {
+    var s = document.createElement('script');
+    s.src = 'shared/db.js';
+    s.onload = function () { if (window.CWDB) window.CWDB.init(); };
+    document.head.appendChild(s);
+  }
+
+  // Возврат из модуля должен ощущаться как «назад», а не как открытие хаба
+  // заново. Хаб — обычная страница (плитки это <a href>), поэтому состояние
+  // между переходами не живёт само: запоминаем позицию прокрутки перед уходом
+  // и восстанавливаем при следующем открытии. Работает одинаково при любом
+  // способе возврата — кнопкой из модуля, браузерным «назад», из закладки.
+  (function () {
+    var KEY = 'cw-hub-scroll';
+
+    // Отключаем штатное восстановление: иначе браузер и скрипт будут
+    // прокручивать страницу наперегонки, и итог зависит от того, кто успел.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+    try {
+      var saved = parseInt(sessionStorage.getItem(KEY) || '', 10);
+      if (saved > 0) window.scrollTo(0, saved);
+    } catch (e) { /* приватный режим — просто без восстановления */ }
+
+    function remember() {
+      try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (e) {}
+    }
+
+    // pagehide покрывает переход по ссылке, закрытие и уход в bfcache;
+    // visibilitychange добавляет iOS, где pagehide срабатывает не всегда.
+    window.addEventListener('pagehide', remember);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') remember();
+    });
+  })();
+
+  // --- Резервное копирование -------------------------------------------
+  // Хаб читает хранилища модулей напрямую (один origin), поэтому полная копия
+  // всегда собирается свежей и не может состоять из кусков разного возраста.
+  (function () {
+    var rows = document.getElementById('backupRows');
+    var status = document.getElementById('backupStatus');
+    var fileInput = document.getElementById('backupFile');
+    if (!rows || typeof CWBackup === 'undefined') return;
+
+    function say(key, vars) { status.textContent = CWI18n.t(key, vars); }
+
+    function fmt(iso) {
+      if (!iso) return null;
+      var d = new Date(iso);
+      return isNaN(d) ? null : d.toLocaleString(CWI18n.getLang(), {
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+      });
+    }
+
+    function renderRows() {
+      var log = CWBackup.log();
+      rows.innerHTML = Object.keys(CWBackup.MODULES).map(function (id) {
+        var version = (self.CW_MODULES && self.CW_MODULES[id] || {}).version || '—';
+        var at = fmt((log[id] || {}).at);
+        var cell = at
+          ? '<span>' + at + '</span>'
+          : '<span class="cw-backup__never">' + CWI18n.t('backup.never') + '</span>';
+        return '<tr><td>' + CWI18n.t('module.' + id + '.title') + '</td><td>v' + version + '</td><td>' + cell + '</td></tr>';
+      }).join('');
+    }
+
+    document.getElementById('backupSaveAll').addEventListener('click', function () {
+      say('backup.working');
+      CWBackup.saveAll().then(function (snap) {
+        renderRows();
+        say('backup.saved', { count: snap.modules.length });
+      }).catch(function (e) {
+        console.error(e);
+        say('backup.failed');
+      });
+    });
+
+    document.getElementById('backupRestoreBtn').addEventListener('click', function () { fileInput.click(); });
+
+    fileInput.addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onerror = function () { say('backup.unreadable'); };
+      reader.onload = function () {
+        var check = CWBackup.inspect(reader.result);
+        if (!check.ok) {
+          say(check.error === 'too-new' ? 'backup.too_new' : 'backup.not_a_backup');
+          return;
+        }
+        var snap = check.snapshot;
+        var when = fmt(snap.createdAt) || snap.createdAt;
+        if (!confirm(CWI18n.t('backup.confirm_restore', { date: when, version: snap.app && snap.app.hub || '—' }))) return;
+
+        // Перед заменой данных выгружаем текущее состояние: если файл окажется
+        // не тем, откатиться будет нечем — модули уже перезаписаны.
+        say('backup.working');
+        CWBackup.snapshot().then(function (before) {
+          CWBackup.download(before, 'circuit-workspace-before-restore-' + before.createdAt.slice(0, 10) + '.json');
+          return CWBackup.restore(snap);
+        }).then(function () {
+          say('backup.restored');
+          setTimeout(function () { location.reload(); }, 1200);
+        }).catch(function (err) {
+          console.error(err);
+          say('backup.failed');
+        });
+      };
+      reader.readAsText(file);
+    });
+
+    renderRows();
+    CWI18n.onChange(renderRows);
+  })();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(function (e) {
+      console.warn('SW registration failed', e);
+    });
+  }
+</script>
+</body>
+</html>
