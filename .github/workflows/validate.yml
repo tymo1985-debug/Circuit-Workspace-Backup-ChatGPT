@@ -28,3 +28,6 @@ jobs:
 
       - name: Проверить версии модулей
         run: node scripts/check-versions.mjs
+
+      - name: Проверить общую дизайн-систему и защищённые границы
+        run: node scripts/check-design-system.mjs
