@@ -28,7 +28,11 @@ Circuit Workspace — PWA-хаб, объединяющий инструмент�
 
 ## ⚠️ Единственный источник правды
 
-Монорепо: **`https://github.com/tymo1985-debug/Circuit-Workspace.git`**
+Монорепо: **`https://github.com/tymo1985-debug/Circuit-Workspace-Backup-ChatGPT.git`**
+
+Это единственный репозиторий, в котором разрешено готовить изменения и
+проверять итоговый сайт. `Circuit-Workspace.git` и отдельные репозитории
+модулей не использовать как рабочую основу.
 
 Отдельные репозитории модулей (`Assembly-Programm-`, `Circuit-Planner`,
 `Pioneer-School-Workspace`) могут быть устаревшими относительно монорепо.
@@ -81,6 +85,13 @@ Circuit-Workspace/
 ```
 
 Правки одного модуля — присылать/получать только его файлы, не весь проект.
+
+Пользователь работает через веб-интерфейс GitHub и не использует GitHub
+Desktop. После каждого завершённого шага готовится небольшой ZIP, внутри
+которого сохранены пути от корня репозитория и находятся только изменённые и
+новые файлы. Файлы, которые требуется удалить, в ZIP не подменяются пустыми:
+их нужно перечислить отдельно в ответе. Если удалений нет, это также указывается
+явно. Полный ZIP проекта готовится только по отдельной просьбе пользователя.
 
 ## Версии и версионирование (правило, не текущий снимок)
 
@@ -330,7 +341,7 @@ localStorage + имена баз IndexedDB. Ключи `cw-lang:<id>` и `cw-doc
 
    Быстрее и надёжнее — не глазами, а командой в свежем клоне:
    ```bash
-   git clone --depth 1 https://github.com/tymo1985-debug/Circuit-Workspace.git tmp && cd tmp
+   git clone --depth 1 https://github.com/tymo1985-debug/Circuit-Workspace-Backup-ChatGPT.git tmp && cd tmp
    for f in shared/version.js */index.html service-worker.js \
             congress-project/service-worker.js circuit-planner/sw.js \
             pioneer-school/sw.js appointments/sw.js; do
