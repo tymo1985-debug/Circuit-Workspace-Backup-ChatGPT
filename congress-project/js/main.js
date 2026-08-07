@@ -13,47 +13,13 @@ import { addTask, checkProgram, drawParts, duplicateCurrent, getParts, saveEdit 
 import { openTemplate, resetTemplate, saveTemplate, wrap } from "./template-editor.js";
 import { addMin, clean, clone, id, isLetterable, isSection, today, tv } from "./utils.js";
 
-// Переходный визуальный адаптер дизайн-системы. Он меняет только оболочку и
-// CSS-классы; обработчики, данные, печатные селекторы и содержимое документов
-// остаются прежними. Наблюдатель нужен для строк и диалогов, которые модуль
-// строит динамически через innerHTML.
-function adoptDesignSystem(root=document){
-  let mappings=[
-    [".card",["md-card"]],
-    [".program-table",["md-table","md-table--sticky","md-table--cards"]],
-    [".series-header",["md-sidenav__group"]],
-    [".error-box",["md-banner","md-banner--error"]],
-    [".issue.warn",["md-banner","md-banner--warn"]],
-    [".issue.err",["md-banner","md-banner--error"]],
-    [".icon-btn",["md-icon-btn","md-state-layer"]],
-    [".icon-text-btn",["md-btn","md-state-layer"]],
-  ];
-  mappings.forEach(([selector,classes])=>{
-    let nodes=[];
-    if(root.nodeType===1&&root.matches(selector))nodes.push(root);
-    nodes.push(...root.querySelectorAll(selector));
-    nodes.forEach(node=>{
-      node.classList.add(...classes);
-      if(node.matches(".icon-text-btn"))node.classList.add(node.classList.contains("light")?"md-btn-tonal":node.classList.contains("danger")?"md-btn-text":"md-btn-filled");
-    });
-  });
-}
-
 function buildDesignSystemShell(){
   let header=document.querySelector("header.topbar"),tools=document.querySelector(".top-actions"),layout=$("#mainLayout");
   if(!header||!tools||!layout)return;
-  document.documentElement.dataset.module="congress-project";
-  header.classList.add("md-topbar-v2");
   // nav.js может успеть добавить ссылку «Домой» первым дочерним элементом,
   // поэтому ищем исходный блок заголовка явно, а не по позиции.
   let lead=header.querySelector(":scope > div:not(.top-actions)");
   if(!lead)return;
-  lead.classList.add("md-topbar-v2__lead","md-topbar-v2__titles");
-  let title=lead.querySelector("h1");
-  title.className="md-topbar-v2__title";
-  title.dataset.i18n="module.congress-project.title";
-  title.textContent="Конгрессы";
-  lead.querySelectorAll("p").forEach(node=>node.classList.add("md-topbar-v2__sub"));
   let mark=document.createElement("span");
   mark.className="md-topbar-v2__mark";
   mark.setAttribute("aria-hidden","true");
@@ -62,16 +28,7 @@ function buildDesignSystemShell(){
   let spacer=document.createElement("span");
   spacer.className="md-topbar-v2__spacer";
   header.appendChild(spacer);
-  tools.classList.add("md-toolbar","module-tools");
   header.insertAdjacentElement("afterend",tools);
-  layout.classList.add("md-shell__body");
-  layout.querySelector(".sidebar")?.classList.add("md-sidenav");
-  layout.querySelector(".workspace")?.classList.add("md-page");
-  layout.querySelectorAll(".head > .actions").forEach(node=>node.classList.add("md-toolbar"));
-  adoptDesignSystem(document);
-  new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{
-    if(node.nodeType===1)adoptDesignSystem(node);
-  }))).observe(document.body,{childList:true,subtree:true});
 }
 
 window.onerror=(m,u,l,c,e)=>{let b=$("#errorBox");if(b){b.textContent="Ошибка JavaScript: "+m+"\nСтрока: "+l+"\n"+(e&&e.stack?e.stack:"");b.classList.remove("hidden")}};
