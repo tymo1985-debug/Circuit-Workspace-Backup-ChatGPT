@@ -1,5 +1,5 @@
 // app.js — роутинг и рендеринг экранов
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 
 let LESSONS_SEED = null;
 
@@ -20,28 +20,6 @@ const ROUTES = ['dashboard', 'anketa', 'assignment', 'registration', 'substitute
   'textbooks', 'schedule', 'practical', 'review', 'afterschool', 'signlanguage', 'backup'];
 const DEFAULT_ROUTE = 'dashboard';
 
-// Визуальный адаптер переходного периода. Старые классы остаются крючками
-// существующего рендера, а общие MD3-классы добавляются после каждой
-// отрисовки. Данные, маршруты и обработчики событий этот слой не меняет.
-function adoptDesignSystem(root = document) {
-  const mappings = [
-    ['.route-header', ['md-page__header']],
-    ['.route-header h1', ['md-page__title']],
-    ['.route-sub', ['md-page__lede']],
-    ['.panel', ['md-card']],
-    ['.stat-card', ['md-card']],
-    ['.btn-primary', ['md-btn', 'md-btn-filled', 'md-state-layer']],
-    ['.btn-secondary', ['md-btn', 'md-btn-tonal', 'md-state-layer']],
-    ['.btn-text', ['md-btn', 'md-btn-text', 'md-state-layer']],
-    ['.share-btn', ['md-btn', 'md-btn-tonal', 'md-state-layer']],
-    ['.data-table', ['md-table']],
-    ['.editable-table', ['md-table', 'md-table--sticky']],
-  ];
-  mappings.forEach(([selector, classes]) => {
-    root.querySelectorAll(selector).forEach((node) => node.classList.add(...classes));
-  });
-}
-
 function showRoute(route) {
   // Неизвестный маршрут (устаревшая ссылка, чужой #hash, опечатка) раньше
   // прятал все экраны и не показывал ни одного — пользователь видел пустую
@@ -58,7 +36,6 @@ function showRoute(route) {
 async function renderRoute(route) {
   try {
     await renderRouteInner(route);
-    adoptDesignSystem(document.getElementById('route-' + route) || document);
   } catch (error) {
     // Раньше любой сбой рендера экрана оставлял пустую область без единого
     // сообщения (промис отклонялся в никуда). Теперь ошибка видна.
@@ -106,7 +83,7 @@ async function renderDashboard() {
   ];
   const el = $('#dashboard-cards');
   el.innerHTML = cards.map((c) => `
-    <div class="stat-card">
+    <div class="stat-card md-card">
       <div class="stat-title">${esc(c.title)}</div>
       <div class="stat-value">${esc(c.value)}</div>
       <div class="stat-sub">${esc(c.sub)}</div>
@@ -146,7 +123,7 @@ function renderLocationsList(locations) {
   el.innerHTML = locations.map((l, i) => `
     <div class="list-row">
       <span>${esc(l.hallName)} ${l.hallNumber ? '(' + esc(l.hallNumber) + ')' : ''}</span>
-      <button class="btn-text remove-location" data-index="${i}">${T('ps.app.udalit')}</button>
+      <button class="btn-text md-btn md-btn-text md-state-layer remove-location" data-index="${i}">${T('ps.app.udalit')}</button>
     </div>`).join('');
   $all('.remove-location', el).forEach((btn) => {
     btn.onclick = async () => {
@@ -281,8 +258,8 @@ function renderRegistrationsTable(list) {
       <td>${esc(T('ps.app.reg_transport', { car: Registration.YES_NO_LABELS[r.transport] || '—', lodging: Registration.YES_NO_LABELS[r.lodging] || '—' }))}</td>
       <td>${esc(Registration.LANGUAGE_LABELS[r.language] || r.language || '—')}${(r.format || []).length ? ' · ' + r.format.map((f) => esc(Registration.FORMAT_LABELS[f] || f)).join(', ') : ''}</td>
       <td>
-        ${r.convertedToStudentId ? '' : `<button class="btn-text convert-reg" data-id="${esc(r.id)}" style="color:var(--accent);">${T('ps.app.v_uchaschiesya')}</button>`}
-        <button class="btn-text remove-reg" data-id="${esc(r.id)}">${T('ps.app.udalit')}</button>
+        ${r.convertedToStudentId ? '' : `<button class="btn-text md-btn md-btn-text md-state-layer convert-reg" data-id="${esc(r.id)}" style="color:var(--accent);">${T('ps.app.v_uchaschiesya')}</button>`}
+        <button class="btn-text md-btn md-btn-text md-state-layer remove-reg" data-id="${esc(r.id)}">${T('ps.app.udalit')}</button>
       </td>
     </tr>`).join('');
 
@@ -338,13 +315,13 @@ async function renderSubstitutes() {
 function renderSubstitutesList(list) {
   const el = $('#substitutes-list');
   if (!list.length) { el.innerHTML = `<p class="hint">${T('ps.app.zamestiteli_poka_ne_dobavleny')}</p>`; return; }
-  el.innerHTML = `<div class="panel"><table class="data-table"><thead><tr><th>#</th><th>${T('ps.ui.imya')}</th><th>${T('ps.ui.vozrast')}</th><th>${T('ps.app.utverzhden')}</th><th></th></tr></thead><tbody>
+  el.innerHTML = `<div class="panel md-card"><table class="data-table md-table"><thead><tr><th>#</th><th>${T('ps.ui.imya')}</th><th>${T('ps.ui.vozrast')}</th><th>${T('ps.app.utverzhden')}</th><th></th></tr></thead><tbody>
     ${list.map((s) => `<tr>
       <td>${esc(s.rank ?? '—')}</td>
       <td>${esc(s.fullName)}${s.age >= 80 ? ' <span class="badge-warn">80+</span>' : ''}</td>
       <td>${esc(s.age ?? '—')}</td>
       <td>${s.approvedByBranch ? T('ps.ui.da') : T('ps.ui.net')}</td>
-      <td><button class="btn-text remove-sub" data-id="${esc(s.id)}">${T('ps.app.udalit')}</button></td>
+      <td><button class="btn-text md-btn md-btn-text md-state-layer remove-sub" data-id="${esc(s.id)}">${T('ps.app.udalit')}</button></td>
     </tr>`).join('')}
   </tbody></table></div>`;
   $all('.remove-sub', el).forEach((btn) => {
@@ -503,7 +480,7 @@ function renderColumnsManager(columns) {
     <div class="column-row">
       <input type="text" class="col-rename" data-key="${esc(c.key)}" value="${esc(Students.label(c))}">
       <span class="column-type-badge">${esc({ text: T('ps.app.tekst'), textarea: T('ps.app.dlinnyy_tekst'), select: T('ps.app.spisok') }[c.type] || c.type)}</span>
-      ${c.protected ? `<span class="column-protected-badge">${T('ps.app.sistemnyy')}</span>` : `<button class="btn-text col-remove" data-key="${esc(c.key)}">${T('ps.app.udalit')}</button>`}
+      ${c.protected ? `<span class="column-protected-badge">${T('ps.app.sistemnyy')}</span>` : `<button class="btn-text md-btn md-btn-text md-state-layer col-remove" data-key="${esc(c.key)}">${T('ps.app.udalit')}</button>`}
     </div>`).join('');
 
   $all('.col-rename', el).forEach((input) => {
@@ -553,8 +530,8 @@ function renderStudentsTable(students, classes, columns) {
       ${cells}
       <td><select class="row-class-select" data-id="${esc(s.id)}">${classOptions}</select></td>
       <td>
-        <button class="btn-text row-formulaire" data-id="${esc(s.id)}" style="color:var(--accent);">${T('ps.app.formulyar')}</button>
-        <button class="btn-text remove-student" data-id="${esc(s.id)}">${T('ps.app.udalit')}</button>
+        <button class="btn-text md-btn md-btn-text md-state-layer row-formulaire" data-id="${esc(s.id)}" style="color:var(--accent);">${T('ps.app.formulyar')}</button>
+        <button class="btn-text md-btn md-btn-text md-state-layer remove-student" data-id="${esc(s.id)}">${T('ps.app.udalit')}</button>
       </td>
     </tr>`;
   }).join('');
@@ -663,7 +640,7 @@ function renderImportModal(existingColumns, resultPanelHtml) {
       <select class="import-mapping-select" data-idx="${i}" style="width:100%;font-size:11px;border:none;border-top:1px solid var(--line);">
         ${mappingOptions(mappings[i])}
       </select>
-      <button class="btn-text import-remove-col" data-idx="${i}" style="font-size:10px;">${T('ps.app.udalit_stolbec')}</button>
+      <button class="btn-text md-btn md-btn-text md-state-layer import-remove-col" data-idx="${i}" style="font-size:10px;">${T('ps.app.udalit_stolbec')}</button>
     </th>`).join('') + '<th class="col-remove-cell"></th>';
 
   const bodyRows = rows.map((row, rIdx) => `
@@ -672,7 +649,7 @@ function renderImportModal(existingColumns, resultPanelHtml) {
         const isAnomaly = anomalies && anomalies[rIdx] && anomalies[rIdx][cIdx];
         return `<td class="${isAnomaly ? 'import-anomaly-cell' : ''}" ${isAnomaly ? `title="${T('ps.app.pohozhe_na_skleyku_dvuh')}"` : ''}><div contenteditable="true" class="import-cell" data-row="${rIdx}" data-col="${cIdx}">${esc(row[cIdx] || '')}</div></td>`;
       }).join('')}
-      <td class="row-remove-cell"><button class="btn-text import-remove-row" data-idx="${rIdx}">✕</button></td>
+      <td class="row-remove-cell"><button class="btn-text md-btn md-btn-text md-state-layer import-remove-row" data-idx="${rIdx}">✕</button></td>
     </tr>`).join('');
 
   const hasNameMapping = currentMappingHasNameFields();
@@ -684,19 +661,19 @@ function renderImportModal(existingColumns, resultPanelHtml) {
     ${anyAnomalies ? `<p class="hint" style="color:var(--warn);">${T('ps.app.yacheyki_s_oranzhevym_fonom')}</p>` : ''}
     ${!hasNameMapping ? `<p class="hint" style="color:var(--warn);">${T('ps.app.sopostavte_odin_iz_stolbcov')}</p>` : ''}
     <div class="editable-table-wrap">
-      <table class="editable-table">
+      <table class="editable-table md-table md-table--sticky">
         <thead><tr>${headerRow}</tr></thead>
         <tbody>${bodyRows}</tbody>
       </table>
     </div>
     <div class="btn-row">
-      <button class="btn-secondary" id="import-add-row">${T('ps.app.stroka')}</button>
-      <button class="btn-secondary" id="import-add-col">${T('ps.app.stolbec')}</button>
+      <button class="btn-secondary md-btn md-btn-tonal md-state-layer" id="import-add-row">${T('ps.app.stroka')}</button>
+      <button class="btn-secondary md-btn md-btn-tonal md-state-layer" id="import-add-col">${T('ps.app.stolbec')}</button>
     </div>
     ${resultPanelHtml || ''}
     <div class="modal-close-row">
-      <button class="btn-secondary" id="import-cancel-btn">${resultPanelHtml ? T('ps.app.zakryt') : T('ps.app.otmena')}</button>
-      ${resultPanelHtml ? '' : `<button class="btn-primary" id="import-confirm-btn" ${hasNameMapping ? '' : 'disabled'}>${T('ps.app.import_btn', { n: rows.length })}</button>`}
+      <button class="btn-secondary md-btn md-btn-tonal md-state-layer" id="import-cancel-btn">${resultPanelHtml ? T('ps.app.zakryt') : T('ps.app.otmena')}</button>
+      ${resultPanelHtml ? '' : `<button class="btn-primary md-btn md-btn-filled md-state-layer" id="import-confirm-btn" ${hasNameMapping ? '' : 'disabled'}>${T('ps.app.import_btn', { n: rows.length })}</button>`}
     </div>
   `);
 
@@ -783,7 +760,7 @@ async function confirmPdfImport(existingColumns) {
     renderDashboard();
 
     const resultHtml = `
-      <div class="panel" style="margin-top:14px;background:${errors.length ? '#FBEFE9' : '#EAF3EC'};">
+      <div class="panel md-card" style="margin-top:14px;background:${errors.length ? '#FBEFE9' : '#EAF3EC'};">
         <h3 style="margin-top:0;">${T('ps.app.import_zavershen')}</h3>
         <p>${T('ps.app.imported_ok', { ok: imported, total: rows.length })}</p>
         ${errors.length ? `<p>${T('ps.app.not_imported', { n: errors.length })}</p><ul class="simple-list">${errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
@@ -794,7 +771,7 @@ async function confirmPdfImport(existingColumns) {
     // Любая непредвиденная ошибка теперь видна пользователю внутри окна,
     // а не приводит к «зависшему» модальному окну без обратной связи.
     renderImportModal(existingColumns, `
-      <div class="panel" style="margin-top:14px;background:#FBEFE9;">
+      <div class="panel md-card" style="margin-top:14px;background:#FBEFE9;">
         <h3 style="margin-top:0;">${T('ps.app.ne_udalos_zavershit_import')}</h3>
         <p>${esc(e.message)}</p>
       </div>`);
@@ -816,12 +793,12 @@ async function openExportPicker() {
         </label>`).join('')}
     </div>
     <div class="btn-row">
-      <button class="btn-primary" id="export-do-pdf">${T('ps.app.skachat_pdf_spisok')}</button>
-      <button class="btn-primary" id="export-do-xlsx">${T('ps.app.skachat_excel_xlsx')}</button>
-      <button class="btn-secondary" id="export-do-csv">${T('ps.app.skachat_csv')}</button>
+      <button class="btn-primary md-btn md-btn-filled md-state-layer" id="export-do-pdf">${T('ps.app.skachat_pdf_spisok')}</button>
+      <button class="btn-primary md-btn md-btn-filled md-state-layer" id="export-do-xlsx">${T('ps.app.skachat_excel_xlsx')}</button>
+      <button class="btn-secondary md-btn md-btn-tonal md-state-layer" id="export-do-csv">${T('ps.app.skachat_csv')}</button>
     </div>
     <p class="hint">${T('ps.app.fayl_xlsx_otkryvaetsya_v')}</p>
-    <div class="modal-close-row"><button class="btn-secondary" id="export-close-btn">${T('ps.app.zakryt')}</button></div>
+    <div class="modal-close-row"><button class="btn-secondary md-btn md-btn-tonal md-state-layer" id="export-close-btn">${T('ps.app.zakryt')}</button></div>
   `);
 
   const getSelectedColumns = async () => {
@@ -922,7 +899,7 @@ async function renderSchedule() {
       mediaHtml += lesson.bibleReadings.map((r) => mediaBlock(T('ps.app.hudozh_chtenie_biblii'), { title: r.passage, duration: r.duration, cue: r.cue })).join('');
     }
     return `
-      <div class="panel lesson-card">
+      <div class="panel md-card lesson-card">
         <div class="lesson-head">
           <div class="lesson-number">${T('ps.app.lesson_n', { n: esc(lesson.number) })}${lesson.letter ? esc(lesson.letter) : ''}</div>
           <div class="lesson-teacher">${esc(teacherLabel)} ${T('ps.app.day_suffix', { n: esc(lesson.day) })}</div>
@@ -935,7 +912,7 @@ async function renderSchedule() {
         ${mediaHtml || `<p class="hint">${T('ps.app.naglyadnye_materialy_dlya_etogo')}</p>`}
       </div>`;
   }).join('') + `
-    <div class="panel">
+    <div class="panel md-card">
       <h3>${T('ps.app.pravilo_po_naglyadnym_posobiyam')}</h3>
       <ul class="fact-list">
         <li>${T('ps.app.max_images', { n: seed.visualAidsRule.maxImagesPerLesson })}</li>
@@ -965,7 +942,7 @@ async function renderPractical() {
   const sessions = await Practical.list();
   const el = $('#practical-list');
   el.innerHTML = sessions.map((s) => `
-    <div class="panel">
+    <div class="panel md-card">
       <h3>${T('ps.app.practical_n', { n: esc(s.sessionNumber) })}</h3>
       <label class="checkbox-label"><input type="checkbox" class="pr-rehearsed" data-id="${esc(s.id)}" ${s.rehearsed ? 'checked' : ''}> ${T('ps.app.otrepetirovano_zaranee')}</label>
       <label class="checkbox-label"><input type="checkbox" class="pr-general" data-id="${esc(s.id)}" ${s.generalRehearsalDone ? 'checked' : ''}> ${T('ps.app.generalnaya_repeticiya_v_den')}</label>
@@ -990,8 +967,8 @@ async function savePracticalField(id, field, value) {
 async function renderReview() {
   const reviews = await Review.list();
   const el = $('#review-list');
-  el.innerHTML = `<div class="panel"><p class="hint">${esc(Review.NOTE)}</p></div>` + reviews.map((r) => `
-    <div class="panel">
+  el.innerHTML = `<div class="panel md-card"><p class="hint">${esc(Review.NOTE)}</p></div>` + reviews.map((r) => `
+    <div class="panel md-card">
       <h3>${T('ps.app.day_n', { n: esc(r.day) })}</h3>
       <div class="form-grid">
         <label>${T('ps.app.minut_u_prepodavatelya_a')} <input type="number" class="rv-a" data-id="${esc(r.id)}" value="${esc(r.teacherAMinutesUsed ?? '')}" max="15"></label>

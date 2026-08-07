@@ -35,6 +35,17 @@ for (const protectedMarker of [
   if (!plannerApp.includes(protectedMarker)) errors.push(`circuit-planner/app.js: исчез защищённый маркер ${protectedMarker}`);
 }
 
+const pioneerHtml = await readFile('pioneer-school/index.html', 'utf8');
+const pioneerApp = await readFile('pioneer-school/js/app.js', 'utf8');
+if (pioneerApp.includes('adoptDesignSystem')) {
+  errors.push('pioneer-school/js/app.js: переходный адаптер Школы должен быть удалён');
+}
+for (const marker of ['md-page__header', 'md-page__title', 'md-page__lede', 'md-card', 'md-btn', 'md-table']) {
+  if (!pioneerHtml.includes(marker) && !pioneerApp.includes(marker)) {
+    errors.push(`pioneer-school: общий класс ${marker} не перенесён в исходную разметку`);
+  }
+}
+
 if (errors.length) {
   console.error(`Проверка дизайн-системы не пройдена:\n- ${errors.join('\n- ')}`);
   process.exitCode = 1;
