@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="ru" data-theme="light" data-module="circuit-planner">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -263,31 +263,31 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
 <body class="cw-has-bottom-nav">
   <div class="app" id="appRoot">
     <div class="mobile-overlay" id="mobileOverlay" hidden></div>
-    <aside class="sidebar">
+    <aside class="sidebar md-sidenav">
       <div class="brand"><div class="logo"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="150" y="96" width="26" height="76" rx="13" fill="#e6dcff"/><rect x="336" y="96" width="26" height="76" rx="13" fill="#e6dcff"/><rect x="120" y="140" width="272" height="256" rx="32" fill="#f1eefb"/><rect x="120" y="140" width="272" height="72" rx="32" fill="#3d2470"/><rect x="120" y="180" width="272" height="32" fill="#3d2470"/><circle cx="160" cy="252" r="10" fill="#c9a3ff"/><circle cx="200" cy="252" r="10" fill="#c9a3ff"/><circle cx="240" cy="252" r="10" fill="#c9a3ff"/><circle cx="160" cy="292" r="10" fill="#c9a3ff"/><path d="M204 318 L244 358 L316 274" fill="none" stroke="#4be0d0" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h1 data-i18n="module.circuit-planner.title">Клиндарий</h1><p>Circuit Workspace</p></div></div>
       <nav class="menu" id="desktopNav"></nav>
       <div class="summary"><strong data-i18n="cp.quick_status">Быстрый статус</strong><div id="sideStatus" class="small"></div></div>
     </aside>
     <main class="main">
       <div data-i18n="cp.offline" class="offline-banner" id="offlineBanner">Вы офлайн. Изменения сохраняются локально.</div>
-      <header class="topbar">
-        <div class="topbar-title-row">
+      <header class="topbar md-topbar-v2">
+        <div class="topbar-title-row md-topbar-v2__lead">
           <button class="md-btn md-btn-outlined md-state-layer mobile-menu-btn" id="mobileMenuToggleBtn" type="button" aria-label="Открыть меню" data-i18n-aria-label="cp.a_open_menu" aria-expanded="false"><span data-i18n="cp.menu_btn">☰ Меню</span></button>
-          <div class="topbar-title-block">
+          <div class="topbar-title-block md-topbar-v2__titles">
             <div data-i18n="cp.version_label" class="version-badge">Версия: …</div>
-            <h2 data-i18n="cp.screen_calendar" id="screenTitle">Календарь</h2>
+            <h2 data-i18n="cp.screen_calendar" id="screenTitle" class="md-topbar-v2__title">Календарь</h2>
             <button id="nextVisitPill" class="md-chip md-state-layer" type="button" style="display:none;margin:6px 0;font-size:14px;padding:7px 14px;max-width:100%;align-items:center;gap:6px"><span id="nextVisitPillName" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0"></span><span id="nextVisitPillDate" style="white-space:nowrap;flex-shrink:0"></span></button>
-            <p id="screenSubtitle"></p>
+            <p id="screenSubtitle" class="md-topbar-v2__sub"></p>
           </div>
         </div>
       </header>
       <section id="calendar" class="screen active">
         <div class="calendar-layout" id="calendarLayout">
           <div class="calendar-shell">
-            <div class="calendar-toolbar">
+            <div class="calendar-toolbar md-toolbar">
               <div class="calendar-toolbar-title"><div class="small" id="calendarServiceYearLabel"></div><h3 class="calendar-title" id="monthLabel"></h3><div class="calendar-sub" id="calendarRangeLabel"></div></div>
               <div class="calendar-controls">
-                <div class="calendar-nav"><button class="icon-btn" id="prevMonthBtn" type="button" aria-label="Предыдущий месяц" data-i18n-aria-label="cp.a_prev_month">‹</button><button data-i18n="cp.countdown_today" class="md-chip md-state-layer" id="todayMonthBtn" type="button">Сегодня</button><button class="icon-btn" id="nextMonthBtn" type="button" aria-label="Следующий месяц" data-i18n-aria-label="cp.a_next_month">›</button></div>
+                <div class="calendar-nav"><button class="icon-btn md-icon-btn md-state-layer" id="prevMonthBtn" type="button" aria-label="Предыдущий месяц" data-i18n-aria-label="cp.a_prev_month">‹</button><button data-i18n="cp.countdown_today" class="md-chip md-state-layer" id="todayMonthBtn" type="button">Сегодня</button><button class="icon-btn md-icon-btn md-state-layer" id="nextMonthBtn" type="button" aria-label="Следующий месяц" data-i18n-aria-label="cp.a_next_month">›</button></div>
                 <details class="toolbar-more">
                   <summary data-i18n="cp.more_btn" class="md-chip md-state-layer">⚙ Ещё</summary>
                   <div class="toolbar-more-panel">
@@ -303,13 +303,13 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
             </div>
         <div id="calendarGrid"></div>
           </div>
-          <aside class="calendar-side">
+          <aside class="calendar-side md-sheet">
             <div class="side-card calendar-details-card"><h4 data-i18n="cp.day_week_details" id="calendarSideTitle">Детали дня / недели</h4><div class="small" id="calendarSideMeta">—</div><div class="side-row" id="calendarSideCountdownRow" style="margin-top:8px"><div class="side-label" id="calendarSideCountdown">—</div><select id="countdownUnitSelect" style="width:auto;padding:4px 8px;font-size:12px"><option data-i18n="cp.days" value="days">дни</option><option data-i18n="cp.hours" value="hours">часы</option><option data-i18n="cp.weeks" value="weeks">недели</option><option data-i18n="cp.months" value="months">месяцы</option></select></div><div id="calendarSideDetails" style="margin-top:12px"></div></div>
           </aside>
         </div>
       </section>
       <section id="events" class="screen"><div class="md-card"><div class="event-tools"><input id="eventSearchInput" type="text" placeholder="Поиск по названию, адресу или расписанию" data-i18n-placeholder="cp.a_search_ph" /><select id="eventColorFilter" aria-label="Группа / цвет" data-i18n-aria-label="cp.a_group_color"><option data-i18n="cp.all_event_groups" value="all">Все группы / цвета</option></select><select id="eventVisitFilter" aria-label="Тип визита" data-i18n-aria-label="cp.a_visit_type"><option data-i18n="cp.all_entries" value="all">Все записи</option><option data-i18n="cp.no_visit_type" value="unset">⚠️ Без типа визита</option><option data-i18n="cp.visit_type_congregation" value="congregation">Собрание</option><option data-i18n="cp.visit_type_group" value="group">Группа</option><option data-i18n="cp.visit_type_pregroup" value="pregroup">Предгруппа</option></select><button data-i18n="cp.delete_all_events" class="md-btn md-btn-danger md-state-layer" id="deleteAllEventsBtn" type="button">Удалить все собрания</button><button data-i18n="cp.add_event" class="md-btn md-btn-filled md-state-layer" id="newEventBtn" type="button">+ Новое собрание</button><div data-i18n="cp.shown_0_of_0" class="small" id="eventsListCount">Показано: 0 из 0</div></div><h3 class="event-templates-title" hidden></h3><div id="eventsList" class="grid"></div></div></section>
-      <div class="modal" id="eventEditorModal" hidden><div class="modal-card"><div class="modal-head"><h3 data-i18n="cp.event_editor">Редактор собрания</h3><button class="icon-btn" id="eventEditorCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div><div class="form-grid"><div><label data-i18n="cp.name" class="small">Название</label><input id="eventNameInput" type="text" /></div><div>
+      <div class="modal" id="eventEditorModal" hidden><div class="modal-card md-dialog"><div class="modal-head"><h3 data-i18n="cp.event_editor">Редактор собрания</h3><button class="icon-btn md-icon-btn md-state-layer" id="eventEditorCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div><div class="form-grid"><div><label data-i18n="cp.name" class="small">Название</label><input id="eventNameInput" type="text" /></div><div>
 <label data-i18n="cp.color" class="small">Цвет</label>
 <select id="eventColorInput">
   <option data-i18n="cp.color_green_i" value="#1f7a45">🟢 Зелёный</option>
@@ -328,14 +328,14 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
   <option data-i18n="cp.color_purple_i" value="#8e24aa">🟣 Пурпурный</option>
   <option data-i18n="cp.color_ginger_i" value="#f4511e">🟠 Рыжий</option>
   <option data-i18n="cp.color_lightgreen_i" value="#43a047">🟢 Светло-зелёный</option>
-</select></div><div><label data-i18n="cp.address" class="small">Адрес</label><div style="display:flex;gap:6px"><input id="eventAddressInput" type="text" /><button class="icon-btn" type="button" id="geocodeEventBtn" title="Определить координаты для планирования" data-i18n-title="cp.a_detect_coords">📍</button></div><div class="small" id="eventDistanceStatus" style="margin-top:4px;color:var(--muted)"></div></div><div><label data-i18n="cp.schedule" class="small">Расписание</label><input id="eventScheduleInput" type="text" placeholder="Ср 19:00, Сб 10:00" data-i18n-placeholder="cp.a_schedule_ph" /></div><div><label data-i18n="cp.visit_type_label" class="small">Тип визита (для напоминаний S302/письмо)</label><select id="eventVisitTypeInput"><option data-i18n="cp.not_a_visit" value="">Не визит (обычная запись)</option><option data-i18n="cp.visit_type_congregation" value="congregation">Собрание</option><option data-i18n="cp.visit_type_group" value="group">Группа</option><option data-i18n="cp.visit_type_pregroup" value="pregroup">Предгруппа</option></select></div>
+</select></div><div><label data-i18n="cp.address" class="small">Адрес</label><div style="display:flex;gap:6px"><input id="eventAddressInput" type="text" /><button class="icon-btn md-icon-btn md-state-layer" type="button" id="geocodeEventBtn" title="Определить координаты для планирования" data-i18n-title="cp.a_detect_coords">📍</button></div><div class="small" id="eventDistanceStatus" style="margin-top:4px;color:var(--muted)"></div></div><div><label data-i18n="cp.schedule" class="small">Расписание</label><input id="eventScheduleInput" type="text" placeholder="Ср 19:00, Сб 10:00" data-i18n-placeholder="cp.a_schedule_ph" /></div><div><label data-i18n="cp.visit_type_label" class="small">Тип визита (для напоминаний S302/письмо)</label><select id="eventVisitTypeInput"><option data-i18n="cp.not_a_visit" value="">Не визит (обычная запись)</option><option data-i18n="cp.visit_type_congregation" value="congregation">Собрание</option><option data-i18n="cp.visit_type_group" value="group">Группа</option><option data-i18n="cp.visit_type_pregroup" value="pregroup">Предгруппа</option></select></div>
 <div id="eventVisitOnlyFields" style="display:contents">
 <div><label data-i18n="cp.cong_number_label" class="small">№ собрания (для писем, необязательно)</label><input id="eventCongNumberInput" type="text" placeholder="Например: 14761" data-i18n-placeholder="cp.a_number_ph" /></div>
 <div><label data-i18n="cp.vf_lang_default" class="small">🌐 Язык формуляра визита по умолчанию</label><select id="eventFormLanguageSelect"><option data-i18n="cp.as_interface_lang" value="">Как язык интерфейса</option><option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option><option value="pl">Polski</option></select></div>
 <div style="grid-column:1 / -1;margin-top:6px;padding-top:12px;border-top:1px dashed var(--line)"><div data-i18n="cp.contact_section" class="small" style="font-weight:700;margin-bottom:8px">Контакт ответственного (не обязательно)</div></div>
-<div><label data-i18n="cp.contact_name_label" class="small">Имя ответственного</label><div style="display:flex;gap:6px"><input id="eventContactNameInput" type="text" placeholder="Например: брат Иван" data-i18n-placeholder="cp.a_contact_ph" /><button class="icon-btn copy-btn" type="button" data-copy-input="eventContactNameInput" title="Копировать" data-i18n-title="cp.a_copy" aria-label="Копировать" data-i18n-aria-label="cp.a_copy">📋</button></div></div>
-<div><label data-i18n="cp.contact_phone" class="small">Телефон</label><div style="display:flex;gap:6px"><input id="eventContactPhoneInput" type="tel" placeholder="+420 ..." /><button class="icon-btn copy-btn" type="button" data-copy-input="eventContactPhoneInput" title="Копировать" data-i18n-title="cp.a_copy" aria-label="Копировать" data-i18n-aria-label="cp.a_copy">📋</button></div></div>
-<div><label data-i18n="cp.contact_email" class="small">E-mail</label><div style="display:flex;gap:6px"><input id="eventContactEmailInput" type="email" placeholder="name@example.com" /><button class="icon-btn copy-btn" type="button" data-copy-input="eventContactEmailInput" title="Копировать" data-i18n-title="cp.a_copy" aria-label="Копировать" data-i18n-aria-label="cp.a_copy">📋</button></div></div>
+<div><label data-i18n="cp.contact_name_label" class="small">Имя ответственного</label><div style="display:flex;gap:6px"><input id="eventContactNameInput" type="text" placeholder="Например: брат Иван" data-i18n-placeholder="cp.a_contact_ph" /><button class="icon-btn copy-btn md-icon-btn md-state-layer" type="button" data-copy-input="eventContactNameInput" title="Копировать" data-i18n-title="cp.a_copy" aria-label="Копировать" data-i18n-aria-label="cp.a_copy">📋</button></div></div>
+<div><label data-i18n="cp.contact_phone" class="small">Телефон</label><div style="display:flex;gap:6px"><input id="eventContactPhoneInput" type="tel" placeholder="+420 ..." /><button class="icon-btn copy-btn md-icon-btn md-state-layer" type="button" data-copy-input="eventContactPhoneInput" title="Копировать" data-i18n-title="cp.a_copy" aria-label="Копировать" data-i18n-aria-label="cp.a_copy">📋</button></div></div>
+<div><label data-i18n="cp.contact_email" class="small">E-mail</label><div style="display:flex;gap:6px"><input id="eventContactEmailInput" type="email" placeholder="name@example.com" /><button class="icon-btn copy-btn md-icon-btn md-state-layer" type="button" data-copy-input="eventContactEmailInput" title="Копировать" data-i18n-title="cp.a_copy" aria-label="Копировать" data-i18n-aria-label="cp.a_copy">📋</button></div></div>
 <div style="grid-column:1 / -1"><label data-i18n="cp.event_note" class="small">Заметка о собрании/группе</label><textarea id="eventContactNoteInput" rows="2" placeholder="Любая полезная информация" data-i18n-placeholder="cp.a_note_ph"></textarea></div>
 </div>
 </div><div class="editor-actions"><button data-i18n="cp.clear" class="md-btn md-btn-outlined md-state-layer" id="resetEventBtn" type="button">Очистить</button><button data-i18n="cp.delete_template_confirm" class="md-btn md-btn-danger md-state-layer" id="deleteEventBtn" type="button" hidden>Удалить собрание</button><button data-i18n="cp.save_event" class="md-btn md-btn-filled md-state-layer" id="saveEventBtn" type="button">Сохранить собрание</button></div></div></div>
@@ -512,10 +512,10 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
     </main>
     <nav class="bottom-nav" id="bottomNav"><div class="bottom-nav-row" id="bottomNavRow"></div></nav>
   </div>
-  <div class="modal" id="pdfModal" hidden><div class="modal-card"><div class="modal-head"><div><h3 data-i18n="cp.export_pdf_title">Экспорт в PDF</h3><div data-i18n="cp.export_pdf_sub" class="modal-sub">Выберите формат и используйте печать браузера.</div></div><button class="icon-btn" id="pdfModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div><div class="pdf-section"><h4 data-i18n="cp.calendar_grid">Календарная сетка</h4><div class="pdf-grid"><button class="pdf-option active" data-pdf-type="month-grid" type="button"><strong data-i18n="cp.month_grid">Календарь месяца</strong><span data-i18n="cp.month_grid_desc">Сетка текущего месяца для печати.</span></button><button class="pdf-option" data-pdf-type="custom-range-calendar" type="button"><strong data-i18n="cp.period_calendar">Календарь периода</strong><span data-i18n="cp.period_calendar_desc">Печать для выбранного диапазона дат.</span></button></div></div><div class="pdf-section"><h4 data-i18n="cp.reports">Список собраний и отчёты</h4><div class="pdf-grid"><button class="pdf-option" data-pdf-type="month-agenda" type="button"><strong data-i18n="cp.month_list">Список собраний месяца</strong><span data-i18n="cp.list_month">Список собраний за текущий месяц.</span></button><button class="pdf-option" data-pdf-type="half-year-agenda" type="button"><strong data-i18n="cp.events_half_year">Собрания за полгода</strong><span data-i18n="cp.list_6">Список собраний за 6 месяцев.</span></button><button class="pdf-option" data-pdf-type="year-agenda" type="button"><strong data-i18n="cp.year_events">Собрания за год</strong><span data-i18n="cp.list_12">Список собраний за 12 месяцев.</span></button><button class="pdf-option" data-pdf-type="custom-range" type="button"><strong data-i18n="cp.list_period">Список за период</strong><span data-i18n="cp.list_range">Список событий за любой диапазон дат.</span></button><button class="pdf-option" data-pdf-type="visits-schedule" type="button"><strong data-i18n="cp.visits_schedule">График посещений (для КС)</strong><span data-i18n="cp.list_year">Расписание визитов по собраниям за служебный год.</span></button><button class="pdf-option" data-pdf-type="year-overview" type="button"><strong data-i18n="cp.year_overview">Годовой обзор</strong><span data-i18n="cp.list_table">Табличная сводка по служебному году.</span></button></div></div><div class="md-card" id="pdfRangeCard" style="margin-top:14px;padding:14px;border-radius:18px;display:none;box-shadow:none;"><div class="form-grid"><label><span data-i18n="cp.range_start" class="small">Начало периода</span><input id="pdfRangeStartInput" type="date" /></label><label><span data-i18n="cp.range_end" class="small">Конец периода</span><input id="pdfRangeEndInput" type="date" /></label></div><p data-i18n="cp.range_hint" class="small" id="pdfRangeHelp" style="margin:10px 0 0;">Выбери даты начала и конца периода.</p></div><div data-i18n="cp.print_popup_hint" class="pdf-hint" id="pdfHint">Если окно печати не появилось, разрешите всплывающее окно/печать в браузере.</div><div class="editor-actions"><button data-i18n="cp.reminders_close" class="md-btn md-btn-outlined md-state-layer" id="pdfCancelBtn" type="button">Закрыть</button><button data-i18n="cp.print" class="md-btn md-btn-filled md-state-layer" id="pdfExportConfirmBtn" type="button">Печать</button></div></div></div>
+  <div class="modal" id="pdfModal" hidden><div class="modal-card md-dialog"><div class="modal-head"><div><h3 data-i18n="cp.export_pdf_title">Экспорт в PDF</h3><div data-i18n="cp.export_pdf_sub" class="modal-sub">Выберите формат и используйте печать браузера.</div></div><button class="icon-btn md-icon-btn md-state-layer" id="pdfModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div><div class="pdf-section"><h4 data-i18n="cp.calendar_grid">Календарная сетка</h4><div class="pdf-grid"><button class="pdf-option active" data-pdf-type="month-grid" type="button"><strong data-i18n="cp.month_grid">Календарь месяца</strong><span data-i18n="cp.month_grid_desc">Сетка текущего месяца для печати.</span></button><button class="pdf-option" data-pdf-type="custom-range-calendar" type="button"><strong data-i18n="cp.period_calendar">Календарь периода</strong><span data-i18n="cp.period_calendar_desc">Печать для выбранного диапазона дат.</span></button></div></div><div class="pdf-section"><h4 data-i18n="cp.reports">Список собраний и отчёты</h4><div class="pdf-grid"><button class="pdf-option" data-pdf-type="month-agenda" type="button"><strong data-i18n="cp.month_list">Список собраний месяца</strong><span data-i18n="cp.list_month">Список собраний за текущий месяц.</span></button><button class="pdf-option" data-pdf-type="half-year-agenda" type="button"><strong data-i18n="cp.events_half_year">Собрания за полгода</strong><span data-i18n="cp.list_6">Список собраний за 6 месяцев.</span></button><button class="pdf-option" data-pdf-type="year-agenda" type="button"><strong data-i18n="cp.year_events">Собрания за год</strong><span data-i18n="cp.list_12">Список собраний за 12 месяцев.</span></button><button class="pdf-option" data-pdf-type="custom-range" type="button"><strong data-i18n="cp.list_period">Список за период</strong><span data-i18n="cp.list_range">Список событий за любой диапазон дат.</span></button><button class="pdf-option" data-pdf-type="visits-schedule" type="button"><strong data-i18n="cp.visits_schedule">График посещений (для КС)</strong><span data-i18n="cp.list_year">Расписание визитов по собраниям за служебный год.</span></button><button class="pdf-option" data-pdf-type="year-overview" type="button"><strong data-i18n="cp.year_overview">Годовой обзор</strong><span data-i18n="cp.list_table">Табличная сводка по служебному году.</span></button></div></div><div class="md-card" id="pdfRangeCard" style="margin-top:14px;padding:14px;border-radius:18px;display:none;box-shadow:none;"><div class="form-grid"><label><span data-i18n="cp.range_start" class="small">Начало периода</span><input id="pdfRangeStartInput" type="date" /></label><label><span data-i18n="cp.range_end" class="small">Конец периода</span><input id="pdfRangeEndInput" type="date" /></label></div><p data-i18n="cp.range_hint" class="small" id="pdfRangeHelp" style="margin:10px 0 0;">Выбери даты начала и конца периода.</p></div><div data-i18n="cp.print_popup_hint" class="pdf-hint" id="pdfHint">Если окно печати не появилось, разрешите всплывающее окно/печать в браузере.</div><div class="editor-actions"><button data-i18n="cp.reminders_close" class="md-btn md-btn-outlined md-state-layer" id="pdfCancelBtn" type="button">Закрыть</button><button data-i18n="cp.print" class="md-btn md-btn-filled md-state-layer" id="pdfExportConfirmBtn" type="button">Печать</button></div></div></div>
   <div class="modal" id="calendarEditor" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><div><h4 data-i18n="cp.event_word" class="editor-title" id="editorTitle">Событие</h4><div class="editor-sub" id="editorMeta">—</div></div><button class="icon-btn" id="editorCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog">
+      <div class="modal-head"><div><h4 data-i18n="cp.event_word" class="editor-title" id="editorTitle">Событие</h4><div class="editor-sub" id="editorMeta">—</div></div><button class="icon-btn md-icon-btn md-state-layer" id="editorCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div class="editor-grid"><label style="grid-column:1 / -1"><span data-i18n="cp.visit_type_congregation">Собрание</span><select id="editorEventSelect"></select></label><label><span data-i18n="cp.start">Начало</span><input id="editorStart" type="date" /></label><label><span data-i18n="cp.end">Конец</span><input id="editorEnd" type="date" /></label></div>
       <div class="editor-grid" id="editorFlagsRow" hidden style="margin-top:4px"><label style="display:flex;align-items:center;gap:8px;flex-direction:row"><input id="editorFlagS302" type="checkbox" style="width:auto" /><span data-i18n="cp.reminders_mark_s302">S302 отправлен</span></label><label style="display:flex;align-items:center;gap:8px;flex-direction:row"><input id="editorFlagLetter" type="checkbox" style="width:auto" /><span data-i18n="cp.reminders_mark_letter">Письмо отправлено</span></label></div>
       <label style="display:grid;gap:6px;margin-top:12px"><span data-i18n="cp.result_note" class="small" id="editorResultLabel">Итоги визита (после посещения)</span><textarea id="editorResultInput" rows="2"></textarea></label>
@@ -524,15 +524,15 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
     </div>
   </div>
   <div class="modal" id="statsModal" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><div><h3 data-i18n="cp.stats_title" id="statsModalTitle">Статистика служебного года</h3><div class="modal-sub" id="statsModalSub"></div></div><button class="icon-btn" id="statsModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog">
+      <div class="modal-head"><div><h3 data-i18n="cp.stats_title" id="statsModalTitle">Статистика служебного года</h3><div class="modal-sub" id="statsModalSub"></div></div><button class="icon-btn md-icon-btn md-state-layer" id="statsModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div id="statsModalBody" class="grid"></div>
       <div class="editor-actions"><button data-i18n="cp.reminders_close" class="md-btn md-btn-filled md-state-layer" id="statsModalOkBtn" type="button">Закрыть</button></div>
     </div>
   </div>
   <div class="modal" id="plannerModal" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><div><h3 data-i18n="cp.autoplan_section">Авто-планирование</h3><div data-i18n="cp.autoplan_hint" class="modal-sub">Выберите собрания — приложение распределит их по свободным неделям.</div></div><button class="icon-btn" id="plannerModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog">
+      <div class="modal-head"><div><h3 data-i18n="cp.autoplan_section">Авто-планирование</h3><div data-i18n="cp.autoplan_hint" class="modal-sub">Выберите собрания — приложение распределит их по свободным неделям.</div></div><button class="icon-btn md-icon-btn md-state-layer" id="plannerModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div class="form-grid"><label><span data-i18n="cp.range_start" class="small">Начало периода</span><input id="plannerStartInput" type="date" /></label><label><span data-i18n="cp.range_end" class="small">Конец периода</span><input id="plannerEndInput" type="date" /></label></div>
       <div id="plannerEventsList" class="grid" style="margin-top:12px;max-height:40vh;overflow:auto"></div>
       <div id="plannerPreview" class="small" style="margin-top:10px"></div>
@@ -550,8 +550,8 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
     </div>
   </div>
   <div class="modal" id="visitFormModal" hidden>
-    <div class="modal-card" style="max-width:920px">
-      <div class="modal-head"><div><h3 data-i18n="cp.visit_form_btn">📋 Формуляр визита</h3><div class="modal-sub" id="visitFormSub">—</div></div><button class="icon-btn" id="visitFormCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog" style="max-width:920px">
+      <div class="modal-head"><div><h3 data-i18n="cp.visit_form_btn">📋 Формуляр визита</h3><div class="modal-sub" id="visitFormSub">—</div></div><button class="icon-btn md-icon-btn md-state-layer" id="visitFormCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div>
         <div class="form-grid"><label><span data-i18n="cp.visit_type" class="small">Тип визита</span><select id="vfVisitType"><option data-i18n="cp.visit_type_congregation" value="meeting">Собрание</option><option data-i18n="cp.visit_type_group" value="group">Группа</option><option data-i18n="cp.visit_type_pregroup" value="pregroup">Предгруппа</option></select></label><label><span data-i18n="cp.vf_lang_label" class="small">🌐 Язык формуляра (может отличаться от языка интерфейса!)</span><select id="vfLanguageSelect"><option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option><option value="pl">Polski</option></select></label></div>
         <div class="small" id="vfLanguageReminder" style="margin-top:6px;padding:8px 12px;border-radius:12px;background:var(--surface2);border:1px dashed var(--line)"></div>
@@ -582,11 +582,11 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
     </div>
   </div>
   <div class="modal" id="letterModal" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><div><h3 data-i18n="cp.letter_before_visit">✉ Письмо перед визитом</h3><div class="modal-sub" id="letterModalSub">—</div></div><button class="icon-btn" id="letterModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog">
+      <div class="modal-head"><div><h3 data-i18n="cp.letter_before_visit">✉ Письмо перед визитом</h3><div class="modal-sub" id="letterModalSub">—</div></div><button class="icon-btn md-icon-btn md-state-layer" id="letterModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div data-i18n="cp.email_entry_hint" class="small" style="margin-bottom:10px">Текст самого email-сообщения для этого визита — сохраняется вместе с ним. Само письмо (PDF) и график визита прикладываются отдельными кнопками ниже — их текст редактируется в Настройках → Письмо.</div>
       <label data-i18n="cp.letter_subject" class="small" for="letterSubjectInput">Тема письма</label>
-      <div style="display:flex;gap:6px;margin-top:6px;margin-bottom:14px"><input id="letterSubjectInput" type="text" style="flex:1" /><button class="icon-btn copy-btn" type="button" data-copy-input="letterSubjectInput" title="Скопировать тему" data-i18n-title="cp.a_copy_subject" aria-label="Скопировать тему" data-i18n-aria-label="cp.a_copy_subject">📋</button></div>
+      <div style="display:flex;gap:6px;margin-top:6px;margin-bottom:14px"><input id="letterSubjectInput" type="text" style="flex:1" /><button class="icon-btn copy-btn md-icon-btn md-state-layer" type="button" data-copy-input="letterSubjectInput" title="Скопировать тему" data-i18n-title="cp.a_copy_subject" aria-label="Скопировать тему" data-i18n-aria-label="cp.a_copy_subject">📋</button></div>
       <label data-i18n="cp.email_text" class="small" for="letterEmailBodyInput">Текст email-сообщения</label>
       <textarea id="letterEmailBodyInput" rows="10" style="font-family:inherit;margin-top:6px"></textarea>
       <div data-i18n="cp.entry_text_hint" class="small" style="margin-top:6px;color:var(--muted)">Этот текст сохранён именно для данной записи и с этого момента не следует за изменениями шаблона по умолчанию в Настройках. Если недавно менял шаблон по умолчанию и хочешь применить его здесь — используй кнопку ниже (текущий текст будет заменён).</div>
@@ -596,27 +596,27 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
     </div>
   </div>
   <div class="modal" id="historyModal" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><div><h3 data-i18n="cp.history_title_icon">🕒 История изменений</h3><div data-i18n="cp.history_hint_short" class="modal-sub">Контрольные точки сохраняются автоматически, не чаще одной раз в 5 минут.</div></div><button class="icon-btn" id="historyModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog">
+      <div class="modal-head"><div><h3 data-i18n="cp.history_title_icon">🕒 История изменений</h3><div data-i18n="cp.history_hint_short" class="modal-sub">Контрольные точки сохраняются автоматически, не чаще одной раз в 5 минут.</div></div><button class="icon-btn md-icon-btn md-state-layer" id="historyModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div id="historyList" class="grid"></div>
       <div class="editor-actions"><button data-i18n="cp.reminders_close" class="md-btn md-btn-filled md-state-layer" id="historyModalCloseBtn2" type="button">Закрыть</button></div>
     </div>
   </div>
   <div class="modal" id="remindersModal" hidden>
-    <div class="modal-card">
-      <div class="modal-head"><div><h3 data-i18n="cp.reminders_title" id="remindersModalTitle">Что нужно отправить</h3><div data-i18n="cp.reminders_subtitle" class="modal-sub" id="remindersModalSub">Ближайшие визиты, которые ждут S302 или письма</div></div><button class="icon-btn" id="remindersModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
+    <div class="modal-card md-dialog">
+      <div class="modal-head"><div><h3 data-i18n="cp.reminders_title" id="remindersModalTitle">Что нужно отправить</h3><div data-i18n="cp.reminders_subtitle" class="modal-sub" id="remindersModalSub">Ближайшие визиты, которые ждут S302 или письма</div></div><button class="icon-btn md-icon-btn md-state-layer" id="remindersModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button></div>
       <div id="remindersModalList" class="grid"></div>
       <div class="editor-actions"><button data-i18n="cp.reminders_close" class="md-btn md-btn-filled md-state-layer" id="remindersModalOkBtn" type="button">Закрыть</button></div>
     </div>
   </div>
   <div class="modal" id="exportModal" hidden>
-    <div class="modal-card">
+    <div class="modal-card md-dialog">
       <div class="modal-head">
         <div>
           <h3 data-i18n="cp.export_title">Экспорт</h3>
           <div data-i18n="cp.export_sub" class="modal-sub">Выберите формат экспорта: резервный JSON или календарь (.ics) для Google/Apple.</div>
         </div>
-        <button class="icon-btn" id="exportModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button>
+        <button class="icon-btn md-icon-btn md-state-layer" id="exportModalCloseBtn" type="button" aria-label="Закрыть" data-i18n-aria-label="cp.a_close">✕</button>
       </div>
       <div class="pdf-section">
         <h4 data-i18n="cp.files">Файлы</h4>

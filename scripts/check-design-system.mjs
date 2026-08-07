@@ -8,8 +8,8 @@ const checks = [
   ['pioneer-school/index.html', ['data-module="pioneer-school"', 'md-topbar-v2', 'md-sidenav', '../shared/theme.js']],
   ['congress-project/index.html', ['data-module="congress-project"', '../shared/theme.js', 'md-topbar-v2', 'md-sidenav', 'md-table--cards', 'id="printArea"']],
   ['congress-project/js/letters.js', ['class="letter-page"']],
-  ['circuit-planner/index.html', ['../shared/theme.js', 'id="pinOverlay"', 'class="bottom-nav"']],
-  ['circuit-planner/app.js', ["dataset.module = 'circuit-planner'", 'themeBridge:', 'md-topbar-v2', 'md-sidenav', 'calendarViewStyles']],
+  ['circuit-planner/index.html', ['data-module="circuit-planner"', '../shared/theme.js', 'id="pinOverlay"', 'class="bottom-nav"', 'md-topbar-v2', 'md-sidenav', 'md-toolbar', 'md-sheet', 'md-dialog', 'md-icon-btn']],
+  ['circuit-planner/app.js', ['themeBridge:', 'nav-btn md-sidenav__item md-state-layer', 'calendarViewStyles']],
 ];
 
 const errors = [];
@@ -42,6 +42,14 @@ for (const marker of ['md-card', 'md-btn', 'md-icon-btn', 'md-table--cards', 'md
 }
 
 const plannerApp = await readFile('circuit-planner/app.js', 'utf8');
+const plannerIndex = await readFile('circuit-planner/index.html', 'utf8');
+if (plannerApp.includes('adoptDesignSystem')) {
+  errors.push('circuit-planner/app.js: переходный адаптер Клиндария должен быть удалён');
+}
+const plannerSources = `${plannerIndex}\n${plannerApp}`;
+for (const marker of ['md-topbar-v2', 'md-sidenav', 'md-toolbar', 'md-sheet', 'md-dialog', 'md-icon-btn', 'md-state-layer']) {
+  if (!plannerSources.includes(marker)) errors.push(`circuit-planner: общий класс ${marker} не перенесён в исходную разметку`);
+}
 for (const protectedMarker of [
   "storageKey: 'service-year-planner-v9-4-2'",
   "localStorage.getItem('syp-pin-hash')",
