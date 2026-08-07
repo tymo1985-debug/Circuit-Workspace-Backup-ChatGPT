@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-module="appointments">
 <head>
 <meta charset="utf-8">
 <title data-i18n="module.appointments.title">Назначения</title>
@@ -26,55 +26,70 @@
 </head>
 <body>
 
-<header class="topbar">
+<header class="topbar md-topbar-v2">
   <!-- .topbar .topbar-title-row — ведущий слот, в который shared/nav.js
        ставит кнопку возврата в хаб. Имена классов заданы именно так,
        чтобы не задавать window.CW_HOME_SLOT вручную. -->
-  <div class="topbar-title-row">
-    <div class="topbar-title-block">
-      <h1 class="md-title-large" data-i18n="module.appointments.title">Назначения</h1>
-      <p class="md-body-small subtitle" data-i18n="module.appointments.desc">Письмо о назначении и вычёркивании старейшин и служителей собрания.</p>
+  <div class="topbar-title-row md-topbar-v2__lead">
+    <span class="md-topbar-v2__mark" aria-hidden="true"><span class="md-icon">&#xe158;</span></span>
+    <div class="topbar-title-block md-topbar-v2__titles">
+      <h1 class="md-topbar-v2__title" data-i18n="module.appointments.title">Назначения</h1>
+      <p class="md-topbar-v2__sub">
+        <span class="module-version" id="moduleVersion"></span>
+        <span class="md-savestatus" id="saveStatus"></span>
+      </p>
     </div>
   </div>
-  <div class="actions">
-    <span class="md-label-small module-version" id="moduleVersion"></span>
+  <span class="md-topbar-v2__spacer"></span>
+  <div class="actions md-topbar-v2__actions">
     <label class="sr-only" for="uiLanguage" data-i18n="hub.language_label">Язык интерфейса</label>
     <select id="uiLanguage" class="lang-select"></select>
+    <button type="button" class="md-btn md-btn-filled md-state-layer" id="printBtn">
+      <span class="md-icon md-icon-sm" aria-hidden="true">&#xe8ad;</span>
+      <span class="print-label" data-i18n="common.print">Печать</span>
+    </button>
   </div>
 </header>
 
 <div class="app">
 
-  <aside class="md-card panel" aria-labelledby="panelHeading">
-    <h2 class="md-title-medium" id="panelHeading" data-i18n="ap.panel.heading">Настройки письма</h2>
+  <aside class="panel" aria-labelledby="panelHeading">
+    <section class="md-formsection" aria-labelledby="panelHeading">
+      <div class="md-formsection__head">
+        <h2 class="md-formsection__title" id="panelHeading" data-i18n="ap.panel.heading">Настройки письма</h2>
+      </div>
 
-    <div class="field">
+    <div class="field md-field">
       <label class="md-label-medium" for="letterDate" data-i18n="ap.field.date">Дата письма</label>
       <input id="letterDate" type="date">
     </div>
 
-    <div class="field">
+    <div class="field md-field">
       <label class="md-label-medium" for="congName" data-i18n="ap.field.congregation">Собрание</label>
       <input id="congName" type="text" list="congList" data-i18n-placeholder="ap.placeholder.congregation" placeholder="Название собрания">
       <!-- Список подсказок берётся из справочника Конгрессов (только чтение). -->
       <datalist id="congList"></datalist>
     </div>
 
-    <div class="field">
+    <div class="field md-field">
       <label class="md-label-medium" for="coordinator" data-i18n="ap.field.coordinator">Координатор совета старейшин</label>
       <input id="coordinator" type="text" data-i18n-placeholder="ap.placeholder.coordinator" placeholder="Имя и фамилия">
     </div>
 
-    <div class="field">
+    <div class="field md-field">
       <label class="md-label-medium" for="coordinatorAddress" data-i18n="ap.field.coordinator_address">Адрес координатора</label>
       <textarea id="coordinatorAddress" rows="3" data-i18n-placeholder="ap.placeholder.address" placeholder="Улица, дом
 Город
 Индекс"></textarea>
     </div>
+    </section>
 
-    <h2 class="md-title-medium section-heading" data-i18n="ap.lists.heading">Списки братьев</h2>
+    <section class="md-formsection" aria-labelledby="listsHeading">
+      <div class="md-formsection__head">
+        <h2 class="md-formsection__title" id="listsHeading" data-i18n="ap.lists.heading">Списки братьев</h2>
+      </div>
 
-    <div class="field">
+    <div class="field md-field list-field">
       <label class="md-label-medium" data-i18n="ap.list.elders">Назначены старейшинами</label>
       <div class="list-editor" id="listElders" data-list="elders"></div>
       <div class="list-actions">
@@ -83,7 +98,7 @@
       </div>
     </div>
 
-    <div class="field">
+    <div class="field md-field list-field">
       <label class="md-label-medium" data-i18n="ap.list.servants">Назначены служителями собрания</label>
       <div class="list-editor" id="listServants" data-list="servants"></div>
       <div class="list-actions">
@@ -92,7 +107,7 @@
       </div>
     </div>
 
-    <div class="field">
+    <div class="field md-field list-field">
       <label class="md-label-medium" data-i18n="ap.list.removed">Вычеркнуты</label>
       <div class="list-editor" id="listRemoved" data-list="removed"></div>
       <div class="list-actions">
@@ -100,51 +115,51 @@
         <button type="button" class="md-btn md-btn-text" data-clear="removed" data-i18n="ap.btn.clear">Очистить</button>
       </div>
     </div>
+    </section>
 
-    <h2 class="md-title-medium section-heading" data-i18n="ap.sender.heading">Данные отправителя</h2>
-
-    <p class="md-body-small hint" data-i18n="ap.sender.shared_hint">Общие данные: те же во всех модулях Circuit Workspace.</p>
+    <section class="md-formsection" aria-labelledby="senderHeading">
+      <div class="md-formsection__head">
+        <h2 class="md-formsection__title" id="senderHeading" data-i18n="ap.sender.heading">Данные отправителя</h2>
+        <p class="md-formsection__hint" data-i18n="ap.sender.shared_hint">Общие данные: те же во всех модулях Circuit Workspace.</p>
+      </div>
 
     <div id="senderFields">
-      <div class="field">
+      <div class="field md-field">
         <label class="md-label-medium" for="senderName" data-i18n="ap.sender.name">Имя и фамилия</label>
         <input id="senderName" type="text">
       </div>
-      <div class="field">
+      <div class="field md-field">
         <label class="md-label-medium" for="senderCode" data-i18n="ap.sender.code">Код района</label>
         <input id="senderCode" type="text">
       </div>
-      <div class="field">
+      <div class="field md-field">
         <label class="md-label-medium" for="senderAddress" data-i18n="ap.sender.address">Адрес</label>
         <textarea id="senderAddress" rows="2"></textarea>
       </div>
-      <div class="field">
+      <div class="field md-field">
         <label class="md-label-medium" for="senderPhone1" data-i18n="ap.sender.phone1">Телефон</label>
         <input id="senderPhone1" type="text">
       </div>
-      <div class="field">
+      <div class="field md-field">
         <label class="md-label-medium" for="senderPhone2" data-i18n="ap.sender.phone2">Второй телефон</label>
         <input id="senderPhone2" type="text">
       </div>
-      <div class="field">
+      <div class="field md-field">
         <label class="md-label-medium" for="senderEmail" data-i18n="ap.sender.email">Эл. почта</label>
         <input id="senderEmail" type="text">
       </div>
     </div>
 
-    <div class="field doc-lang">
+    <div class="field md-field md-field-select doc-lang">
       <label class="md-label-medium" for="docLanguage" data-i18n="ap.doc.language">Язык письма</label>
       <select id="docLanguage"></select>
       <p class="md-body-small hint" data-i18n="ap.doc.language_hint">Язык печатного письма. От языка интерфейса не зависит.</p>
     </div>
-
-    <button type="button" class="md-btn md-btn-filled md-btn-full print-btn" id="printBtn" data-i18n="common.print">Печать</button>
-    <p class="md-body-small save-status" id="saveStatus"></p>
+    </section>
   </aside>
 
   <main class="preview">
-    <!-- Язык письма — свойство документа, а не интерфейса: письмо всегда
-         украинское, даже когда интерфейс переключён на другой язык.
+    <!-- Язык письма — свойство документа, а не интерфейса.
          См. AGENTS.md → «Локализация». -->
     <article class="letter" id="letter" aria-label="Letter">
       <div class="letter-sender" id="outSender"></div>

@@ -5,7 +5,7 @@
 // Внутри хаба это стирало бы офлайн-кэши остальных модулей: Cache Storage
 // общий на весь origin. Здесь, как и в остальных модулях, удаляются строго
 // свои кэши по префиксу.
-const APP_VERSION = '5.1.2';
+const APP_VERSION = '5.1.3';
 const CACHE_PREFIX = 'appointments-cache-v';
 const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 
@@ -36,6 +36,7 @@ const ASSETS = [
   '../shared/fonts/roboto-latin-500-normal.woff2',
   '../shared/fonts/roboto-cyrillic-400-normal.woff2',
   '../shared/fonts/roboto-cyrillic-500-normal.woff2',
+  '../shared/fonts/material-symbols-outlined-subset.woff2',
 ];
 
 self.addEventListener('install', (event) => {

@@ -84,10 +84,16 @@
         var el = $('#saveStatus');
         var time = new Date().toLocaleTimeString(self.CWI18n ? self.CWI18n.getLang() : 'ru',
           { hour: '2-digit', minute: '2-digit' });
-        if (el) el.textContent = t('ap.saved_at', { time: time });
+        if (el) {
+          el.textContent = t('ap.saved_at', { time: time });
+          el.dataset.state = 'saved';
+        }
       } catch (e) {
         var s = $('#saveStatus');
-        if (s) s.textContent = t('ap.save_failed');
+        if (s) {
+          s.textContent = t('ap.save_failed');
+          s.dataset.state = 'error';
+        }
       }
     }, 400);
   }
@@ -113,7 +119,7 @@
 
     values.forEach(function (value, index) {
       var row = document.createElement('div');
-      row.className = 'list-row';
+      row.className = 'list-row md-list-item';
 
       var input = document.createElement('input');
       input.type = 'text';
@@ -127,7 +133,8 @@
 
       var remove = document.createElement('button');
       remove.type = 'button';
-      remove.textContent = '−';
+      remove.className = 'md-icon-btn md-state-layer';
+      remove.innerHTML = '<span class="md-icon md-icon-sm" aria-hidden="true">&#xe872;</span>';
       remove.title = t('ap.btn.remove_row');
       remove.setAttribute('aria-label', t('ap.btn.remove_row'));
       remove.addEventListener('click', function () {
