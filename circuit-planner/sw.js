@@ -218,15 +218,12 @@ self.addEventListener('fetch', (event) => {
 
   if (isNavigationRequest(request)) {
     event.respondWith((async () => {
-      const cached = (await caches.match(request)) || (await caches.match('./index.html')) || (await caches.match('./'));
-      if (cached) {
-        fetch(request, { cache: 'no-cache' })
-          .then(async (res) => { if (res && res.ok) { const cache = await caches.open(CACHE_RUNTIME); try { await cache.put(request, res.clone()); } catch (_) {} } })
-          .catch(() => {});
-        return cached;
-      }
       const preload = await event.preloadResponse;
-      if (preload) return preload;
+      if (preload && preload.ok) {
+        const cache = await caches.open(CACHE_RUNTIME);
+        cache.put(request, preload.clone()).catch(() => {});
+        return preload;
+      }
       return networkFirst(request, './index.html');
     })());
     return;

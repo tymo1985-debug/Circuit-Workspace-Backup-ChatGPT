@@ -1,5 +1,5 @@
 // Школа пионеров — service worker модуля.
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.6.1';
 const CACHE_PREFIX = 'pioneer-school-cache-v';
 const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 
@@ -18,6 +18,7 @@ const ASSETS = [
   '../shared/style.css',
   '../shared/nav.js',
   '../shared/backup.js',
+  '../shared/pwa-update.js',
   // Локализация: общий слой + словарь модуля. Без них офлайн-запуск падал бы
   // на T is not defined — T() зовут ещё на этапе объявления констант.
   '../shared/version.js',
