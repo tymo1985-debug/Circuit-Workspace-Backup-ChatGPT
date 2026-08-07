@@ -17,8 +17,7 @@ body {
   clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 
-/* Старые классы шапки временно сохранены рядом с md-topbar-v2: shared/nav.js
-   пока ищет по ним ведущий слот для кнопок хаба и резервной копии. */
+/* Версия и статус живут в общей шапке md-topbar-v2. */
 .module-version { font-variant-numeric: tabular-nums; }
 .module-version + .md-savestatus:not(:empty)::before { margin-left: var(--cw-space-1); }
 .md-savestatus:empty { display: none; }

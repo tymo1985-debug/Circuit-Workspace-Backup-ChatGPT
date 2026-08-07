@@ -26,13 +26,11 @@
 </head>
 <body>
 
-<header class="topbar md-topbar-v2">
-  <!-- .topbar .topbar-title-row — ведущий слот, в который shared/nav.js
-       ставит кнопку возврата в хаб. Имена классов заданы именно так,
-       чтобы не задавать window.CW_HOME_SLOT вручную. -->
-  <div class="topbar-title-row md-topbar-v2__lead">
+<header class="md-topbar-v2">
+  <!-- Общий ведущий слот: shared/nav.js ставит сюда возврат в хаб и копию. -->
+  <div class="md-topbar-v2__lead">
     <span class="md-topbar-v2__mark" aria-hidden="true"><span class="md-icon">&#xe158;</span></span>
-    <div class="topbar-title-block md-topbar-v2__titles">
+    <div class="md-topbar-v2__titles">
       <h1 class="md-topbar-v2__title" data-i18n="module.appointments.title">Назначения</h1>
       <p class="md-topbar-v2__sub">
         <span class="module-version" id="moduleVersion"></span>
@@ -41,7 +39,7 @@
     </div>
   </div>
   <span class="md-topbar-v2__spacer"></span>
-  <div class="actions md-topbar-v2__actions">
+  <div class="md-topbar-v2__actions">
     <label class="sr-only" for="uiLanguage" data-i18n="hub.language_label">Язык интерфейса</label>
     <select id="uiLanguage" class="lang-select"></select>
     <button type="button" class="md-btn md-btn-filled md-state-layer" id="printBtn">
