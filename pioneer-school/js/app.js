@@ -1,5 +1,5 @@
 // app.js — роутинг и рендеринг экранов
-const APP_VERSION = '1.6.4';
+const APP_VERSION = '1.7.0';
 
 let LESSONS_SEED = null;
 
@@ -20,6 +20,28 @@ const ROUTES = ['dashboard', 'anketa', 'assignment', 'registration', 'substitute
   'textbooks', 'schedule', 'practical', 'review', 'afterschool', 'signlanguage', 'backup'];
 const DEFAULT_ROUTE = 'dashboard';
 
+// Визуальный адаптер переходного периода. Старые классы остаются крючками
+// существующего рендера, а общие MD3-классы добавляются после каждой
+// отрисовки. Данные, маршруты и обработчики событий этот слой не меняет.
+function adoptDesignSystem(root = document) {
+  const mappings = [
+    ['.route-header', ['md-page__header']],
+    ['.route-header h1', ['md-page__title']],
+    ['.route-sub', ['md-page__lede']],
+    ['.panel', ['md-card']],
+    ['.stat-card', ['md-card']],
+    ['.btn-primary', ['md-btn', 'md-btn-filled', 'md-state-layer']],
+    ['.btn-secondary', ['md-btn', 'md-btn-tonal', 'md-state-layer']],
+    ['.btn-text', ['md-btn', 'md-btn-text', 'md-state-layer']],
+    ['.share-btn', ['md-btn', 'md-btn-tonal', 'md-state-layer']],
+    ['.data-table', ['md-table']],
+    ['.editable-table', ['md-table', 'md-table--sticky']],
+  ];
+  mappings.forEach(([selector, classes]) => {
+    root.querySelectorAll(selector).forEach((node) => node.classList.add(...classes));
+  });
+}
+
 function showRoute(route) {
   // Неизвестный маршрут (устаревшая ссылка, чужой #hash, опечатка) раньше
   // прятал все экраны и не показывал ни одного — пользователь видел пустую
@@ -36,6 +58,7 @@ function showRoute(route) {
 async function renderRoute(route) {
   try {
     await renderRouteInner(route);
+    adoptDesignSystem(document.getElementById('route-' + route) || document);
   } catch (error) {
     // Раньше любой сбой рендера экрана оставлял пустую область без единого
     // сообщения (промис отклонялся в никуда). Теперь ошибка видна.

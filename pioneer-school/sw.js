@@ -1,5 +1,5 @@
 // Школа пионеров — service worker модуля.
-const APP_VERSION = '1.6.4';
+const APP_VERSION = '1.7.0';
 const CACHE_PREFIX = 'pioneer-school-cache-v';
 const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 
@@ -31,6 +31,7 @@ const ASSETS = [
   '../shared/fonts/roboto-latin-500-normal.woff2',
   '../shared/fonts/roboto-cyrillic-400-normal.woff2',
   '../shared/fonts/roboto-cyrillic-500-normal.woff2',
+  '../shared/fonts/material-symbols-outlined-subset.woff2',
   './js/db.js',
   './js/app.js',
   './js/utils/dateUtils.js',

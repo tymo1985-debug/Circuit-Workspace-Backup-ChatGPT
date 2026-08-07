@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-module="pioneer-school">
 <head>
 <meta charset="UTF-8">
 <title data-i18n="ps.ui.shkola_pionerskogo_sluzheniya">Школа пионерского служения</title>
@@ -16,48 +16,54 @@
 </head>
 <body>
 
-<div class="app-shell">
-  <aside class="sidebar">
-    <div class="brand">
-      <div data-i18n="ps.ui.shps" class="brand-mark">ШПС</div>
-      <div class="brand-text">
-        <div data-i18n="ps.ui.shkola_pionerskogo_sluzheniya" class="brand-title">Школа пионерского служения</div>
-        <div class="brand-sub" id="version-sub">S-255-U</div>
-      </div>
+<header class="md-topbar-v2">
+  <div class="md-topbar-v2__lead">
+    <span class="md-topbar-v2__mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4.5c2.8 2 7.2 2 10 0V12"/><path d="M21 9v6"/>
+      </svg>
+    </span>
+    <div class="md-topbar-v2__titles">
+      <h1 class="md-topbar-v2__title" data-i18n="ps.ui.shkola_pionerskogo_sluzheniya">Школа пионерского служения</h1>
+      <p class="md-topbar-v2__sub" id="version-sub">S-255-U</p>
     </div>
+  </div>
+  <span class="md-topbar-v2__spacer"></span>
+  <div class="md-topbar-v2__actions">
+    <label class="sr-only" for="ui-language" data-i18n="ps.ui.interface_language">Язык интерфейса</label>
+    <select id="ui-language" class="lang-select"></select>
+  </div>
+</header>
 
-    <nav class="nav">
-      <div data-i18n="ps.ui.do_shkoly" class="nav-group-label">До школы</div>
-      <button data-i18n="ps.ui.obzor" class="nav-item" data-route="dashboard">Обзор</button>
-      <button data-i18n="ps.ui.anketa_s_257" class="nav-item" data-route="anketa">Анкета S-257</button>
-      <button data-i18n="ps.ui.naznachenie" class="nav-item" data-route="assignment">Назначение</button>
-      <button data-i18n="ps.ui.registraciya_uchaschihsya" class="nav-item" data-route="registration">Регистрация учащихся</button>
-      <button data-i18n="ps.ui.zamestiteli" class="nav-item" data-route="substitutes">Заместители</button>
-      <button data-i18n="ps.ui.uchaschiesya" class="nav-item" data-route="students">Учащиеся</button>
-      <button data-i18n="ps.ui.uchebniki" class="nav-item" data-route="textbooks">Учебники</button>
+<div class="app-shell md-shell__body">
+  <aside class="sidebar md-sidenav">
+    <nav class="nav" aria-label="Школа пионерского служения" data-i18n-aria-label="ps.ui.shkola_pionerskogo_sluzheniya">
+      <div data-i18n="ps.nav.school" class="nav-group-label md-sidenav__group">Школа</div>
+      <button data-i18n="ps.ui.obzor" class="nav-item md-sidenav__item" data-route="dashboard">Обзор</button>
+      <button data-i18n="ps.ui.uchaschiesya" class="nav-item md-sidenav__item" data-route="students">Учащиеся</button>
+      <button data-i18n="ps.ui.uroki_i_raspisanie" class="nav-item md-sidenav__item" data-route="schedule">Уроки и расписание</button>
+      <button data-i18n="ps.ui.zamestiteli" class="nav-item md-sidenav__item" data-route="substitutes">Заместители</button>
 
-      <div data-i18n="ps.ui.vo_vremya_shkoly" class="nav-group-label">Во время школы</div>
-      <button data-i18n="ps.ui.uroki_i_raspisanie" class="nav-item" data-route="schedule">Уроки и расписание</button>
-      <button data-i18n="ps.ui.prakticheskie_zanyatiya" class="nav-item" data-route="practical">Практические занятия</button>
-      <button data-i18n="ps.ui.ezhednevnoe_povtorenie" class="nav-item" data-route="review">Ежедневное повторение</button>
+      <div data-i18n="ps.nav.lessons" class="nav-group-label md-sidenav__group">Занятия</div>
+      <button data-i18n="ps.ui.prakticheskie_zanyatiya" class="nav-item md-sidenav__item" data-route="practical">Практические занятия</button>
+      <button data-i18n="ps.ui.ezhednevnoe_povtorenie" class="nav-item md-sidenav__item" data-route="review">Ежедневное повторение</button>
+      <button class="nav-item md-sidenav__item" data-route="afterschool">S-253</button>
+      <button data-i18n="ps.ui.zhestovyy_yazyk" class="nav-item md-sidenav__item" data-route="signlanguage">Жестовый язык</button>
 
-      <div data-i18n="ps.ui.posle_shkoly" class="nav-group-label">После школы</div>
-      <button class="nav-item" data-route="afterschool">S-253</button>
+      <div data-i18n="ps.nav.documents" class="nav-group-label md-sidenav__group">Документы</div>
+      <button data-i18n="ps.ui.anketa_s_257" class="nav-item md-sidenav__item" data-route="anketa">Анкета S-257</button>
+      <button data-i18n="ps.ui.naznachenie" class="nav-item md-sidenav__item" data-route="assignment">Назначение</button>
+      <button data-i18n="ps.ui.registraciya_uchaschihsya" class="nav-item md-sidenav__item" data-route="registration">Регистрация учащихся</button>
+      <button data-i18n="ps.ui.uchebniki" class="nav-item md-sidenav__item" data-route="textbooks">Учебники</button>
 
-      <div data-i18n="ps.ui.dop" class="nav-group-label">Доп.</div>
-      <button data-i18n="ps.ui.zhestovyy_yazyk" class="nav-item" data-route="signlanguage">Жестовый язык</button>
-      <button data-i18n="ps.ui.rezervnaya_kopiya" class="nav-item" data-route="backup">Резервная копия</button>
+      <div data-i18n="ps.nav.data" class="nav-group-label md-sidenav__group">Данные</div>
+      <button data-i18n="ps.ui.rezervnaya_kopiya" class="nav-item md-sidenav__item" data-route="backup">Резервная копия</button>
     </nav>
-
-    <div class="sidebar-lang">
-      <label class="sr-only" for="ui-language" data-i18n="ps.ui.interface_language">Язык интерфейса</label>
-      <select id="ui-language"></select>
-    </div>
 
     <div data-i18n="ps.ui.osnovano_tolko_na_s" class="sidebar-footer">Основано только на S-255-U (июнь 2025)</div>
   </aside>
 
-  <main class="content">
+  <main class="content md-page">
 
     <section id="route-dashboard" class="route">
       <header class="route-header">
