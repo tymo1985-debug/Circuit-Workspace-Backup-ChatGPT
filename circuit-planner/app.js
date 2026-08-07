@@ -142,7 +142,7 @@
     config: {
       // Single source of truth for the displayed/stored app version — bump this on
       // every meaningful update so the version badge always reflects what's actually live.
-      version: '9.60.3',
+      version: '9.60.4',
       // NOTE: do NOT change this to match the app version — it is the localStorage key.
       // Changing it will make existing users lose all their saved data on next load.
       storageKey: 'service-year-planner-v9-4-2',
@@ -830,6 +830,7 @@
       },
       importSyncFile(file) {
         if (!file) return App.utils.toast(App.utils.t('sync_no_file'));
+        if (file.size > 25 * 1024 * 1024) return App.utils.toast(App.utils.t('sync_import_failed'));
         if (!window.confirm(App.utils.t('sync_import_confirm'))) { if (App.els.syncImportInput) App.els.syncImportInput.value = ''; return; }
         const reader = new FileReader();
         reader.onload = () => {
@@ -892,7 +893,7 @@
         const item = App.data.getCalendarItemById(itemId); if (!item) return; const event = App.data.getEventById(item.eventId); App.utils.downloadText(`${App.utils.slug(item.title || event?.name || 'event') || 'event'}.ics`, App.utils.makeSingleIcs(item, event), 'text/calendar;charset=utf-8');
       },
       importJson(file) {
-        if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result || '{}')); App.state.app = App.store.migrate(parsed); App.store.save(); const years = Object.keys(App.state.app.serviceYears).map(Number).sort((a,b) => a - b);
+        if (!file) return; if (file.size > 25 * 1024 * 1024) { App.utils.toast(App.utils.t('import_failed')); if (App.els.importInput) App.els.importInput.value = ''; return; } const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(String(reader.result || '{}')); App.state.app = App.store.migrate(parsed); App.store.save(); const years = Object.keys(App.state.app.serviceYears).map(Number).sort((a,b) => a - b);
             const currentSY = App.utils.getServiceYearForDate(new Date());
             const preferredSY = years.includes(currentSY) ? currentSY : (years.length ? years[years.length - 1] : currentSY);
             App.state.selectedYear = preferredSY;

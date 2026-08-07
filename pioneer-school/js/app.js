@@ -1,5 +1,5 @@
 // app.js — роутинг и рендеринг экранов
-const APP_VERSION = '1.6.2';
+const APP_VERSION = '1.6.3';
 
 let LESSONS_SEED = null;
 
@@ -1088,6 +1088,11 @@ function initBackup() {
   $('#import-backup-input').onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      alert(T('ps.app.backup_read_failed', { error: 'Файл больше 25 МБ' }));
+      e.target.value = '';
+      return;
+    }
     if (!confirm(T('ps.app.import_zamenit_tekuschie_dannye'))) return;
     const text = await file.text();
     try {
