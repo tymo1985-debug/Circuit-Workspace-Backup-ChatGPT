@@ -648,12 +648,17 @@
       var file = e.target.files && e.target.files[0];
       e.target.value = '';
       if (!file) return;
+      if (file.size > CWBackup.MAX_BACKUP_BYTES) {
+        say('backup.too_large');
+        return;
+      }
       var reader = new FileReader();
       reader.onerror = function () { say('backup.unreadable'); };
       reader.onload = function () {
         var check = CWBackup.inspect(reader.result);
         if (!check.ok) {
-          say(check.error === 'too-new' ? 'backup.too_new' : 'backup.not_a_backup');
+          say(check.error === 'too-new' ? 'backup.too_new' :
+            check.error === 'too-large' ? 'backup.too_large' : 'backup.not_a_backup');
           return;
         }
         var snap = check.snapshot;

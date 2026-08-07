@@ -30,6 +30,8 @@
 
   var FORMAT = 'circuit-workspace-backup';
   var FORMAT_VERSION = 1;
+  var MAX_BACKUP_BYTES = 25 * 1024 * 1024;
+  var MAX_IDB_ROWS = 100000;
   var LOG_KEY = 'cw-backup-log';
 
   /* Общий слой: настройки, не принадлежащие ни одному модулю. */
@@ -249,12 +251,60 @@
     var data;
     try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; }
     catch (e) { return { ok: false, error: 'not-json' }; }
+    if (typeof raw === 'string' && raw.length > MAX_BACKUP_BYTES) return { ok: false, error: 'too-large' };
     if (!data || data.format !== FORMAT) return { ok: false, error: 'not-a-backup' };
     if (typeof data.formatVersion !== 'number' || data.formatVersion > FORMAT_VERSION) {
       return { ok: false, error: 'too-new', found: data.formatVersion };
     }
-    if (!data.sections || typeof data.sections !== 'object') return { ok: false, error: 'no-sections' };
+    if (!data.createdAt || !Number.isFinite(Date.parse(data.createdAt))) return { ok: false, error: 'invalid-date' };
+    if (data.scope !== 'full' && data.scope !== 'module') return { ok: false, error: 'invalid-scope' };
+    if (!Array.isArray(data.modules) || data.modules.some(function (id) { return !MODULES[id]; })) {
+      return { ok: false, error: 'invalid-modules' };
+    }
+    if (!isPlainObject(data.sections)) return { ok: false, error: 'no-sections' };
+
+    var allowedSections = ['shared'].concat(Object.keys(MODULES));
+    var sectionIds = Object.keys(data.sections);
+    if (!sectionIds.length || sectionIds.some(function (id) { return allowedSections.indexOf(id) < 0; })) {
+      return { ok: false, error: 'invalid-sections' };
+    }
+
+    var rowCount = 0;
+    for (var i = 0; i < sectionIds.length; i++) {
+      var id = sectionIds[i];
+      var sec = data.sections[id];
+      var keys = id === 'shared' ? SHARED : moduleKeys(id);
+      if (!isPlainObject(sec) || !isPlainObject(sec.local || {}) || !isPlainObject(sec.idb || {})) {
+        return { ok: false, error: 'invalid-section' };
+      }
+      var allowedLocal = keys.local || [];
+      var localNames = Object.keys(sec.local || {});
+      if (localNames.some(function (key) {
+        return allowedLocal.indexOf(key) < 0 || typeof sec.local[key] !== 'string';
+      })) return { ok: false, error: 'invalid-local-data' };
+
+      var allowedDbs = keys.idb || [];
+      var dbNames = Object.keys(sec.idb || {});
+      if (dbNames.some(function (name) { return allowedDbs.indexOf(name) < 0; })) {
+        return { ok: false, error: 'invalid-database' };
+      }
+      for (var d = 0; d < dbNames.length; d++) {
+        var dump = sec.idb[dbNames[d]];
+        if (!isPlainObject(dump) || !isPlainObject(dump.stores)) return { ok: false, error: 'invalid-database' };
+        var stores = Object.keys(dump.stores);
+        for (var s = 0; s < stores.length; s++) {
+          var storeDump = dump.stores[stores[s]];
+          if (!isPlainObject(storeDump) || !Array.isArray(storeDump.rows)) return { ok: false, error: 'invalid-store' };
+          rowCount += storeDump.rows.length;
+          if (rowCount > MAX_IDB_ROWS) return { ok: false, error: 'too-many-rows' };
+        }
+      }
+    }
     return { ok: true, snapshot: data };
+  }
+
+  function isPlainObject(value) {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
   }
 
   /**
@@ -272,11 +322,7 @@
     Object.keys(snap.sections).forEach(function (id) {
       var sec = snap.sections[id] || {};
       var keys = id === 'shared' ? SHARED : moduleKeys(id);
-      var known = (keys.local || []).slice();
-      // Ключи, которых нет в реестре (модуль из более новой версии), всё равно
-      // восстанавливаем — терять чужие данные хуже, чем принести лишние.
-      Object.keys(sec.local || {}).forEach(function (k) { if (known.indexOf(k) < 0) known.push(k); });
-      writeLocal(sec.local || {}, known);
+      writeLocal(sec.local || {}, (keys.local || []).slice());
       Object.keys(sec.idb || {}).forEach(function (name) {
         jobs.push(restoreDb(name, sec.idb[name]));
       });
@@ -323,6 +369,7 @@
   global.CWBackup = {
     FORMAT: FORMAT,
     FORMAT_VERSION: FORMAT_VERSION,
+    MAX_BACKUP_BYTES: MAX_BACKUP_BYTES,
     MODULES: MODULES,
     EXCLUDE: EXCLUDE,
 
