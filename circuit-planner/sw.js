@@ -23,6 +23,7 @@ const APP_SHELL_URLS = [
   // Общий слой (стили + шрифты). Без него офлайн модуль терял оформление,
   // т.к. index.html ссылается на ../shared/style.css.
   '../shared/style.css',
+  '../shared/theme.js',
   '../shared/nav.js',
   '../shared/backup.js',
   // Локализация: скрипты синхронные и в <head>, без них офлайн-запуск

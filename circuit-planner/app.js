@@ -142,7 +142,7 @@
     config: {
       // Single source of truth for the displayed/stored app version — bump this on
       // every meaningful update so the version badge always reflects what's actually live.
-      version: '9.60.5',
+      version: '9.61.0',
       // NOTE: do NOT change this to match the app version — it is the localStorage key.
       // Changing it will make existing users lose all their saved data on next load.
       storageKey: 'service-year-planner-v9-4-2',
@@ -987,6 +987,28 @@
     },
 
     ui: {
+      adoptDesignSystem(root = document) {
+        document.documentElement.dataset.module = 'circuit-planner';
+        const mappings = [
+          ['.topbar', ['md-topbar-v2']],
+          ['.topbar-title-row', ['md-topbar-v2__lead']],
+          ['.topbar-title-block', ['md-topbar-v2__titles']],
+          ['#screenTitle', ['md-topbar-v2__title']],
+          ['#screenSubtitle', ['md-topbar-v2__sub']],
+          ['.sidebar', ['md-sidenav']],
+          ['.nav-btn', ['md-sidenav__item', 'md-state-layer']],
+          ['.calendar-toolbar', ['md-toolbar']],
+          ['.calendar-side', ['md-sheet']],
+          ['.modal-card', ['md-dialog']],
+          ['.icon-btn', ['md-icon-btn', 'md-state-layer']],
+        ];
+        mappings.forEach(([selector, classes]) => {
+          const nodes = [];
+          if (root.nodeType === 1 && root.matches(selector)) nodes.push(root);
+          nodes.push(...root.querySelectorAll(selector));
+          nodes.forEach((node) => node.classList.add(...classes));
+        });
+      },
       cacheElements() {
         [
           'appRoot','desktopNav','toastWrap','offlineBanner','sideStatus','screenTitle','screenSubtitle','nextVisitPill','nextVisitPillName','nextVisitPillDate',
@@ -1151,6 +1173,7 @@
         }
       },
       renderAll() {
+        this.adoptDesignSystem();
         this.ensureCalendarViewStyles();
         this.ensureEditorNoteField();
         this.ensureFontSizeControl();
@@ -1164,6 +1187,7 @@
         // index.html нет, а снятие класса team-hidden уже делает applyLayout().
         if (App.els.calendarLayout) App.els.calendarLayout.classList.remove('team-hidden');
         this.renderNav();
+        this.adoptDesignSystem(App.els.desktopNav || document);
         this.renderScreenHeader();
         this.renderCalendar();
         this.cleanupCalendarChrome();
@@ -1251,7 +1275,13 @@
         document.documentElement.style.setProperty('--ui-font-scale', String(Number(value) / 100));
         if (App.els.fontSizeSelect) App.els.fontSizeSelect.value = value;
       },
-      applyTheme() { document.documentElement.setAttribute('data-theme', App.state.app.settings.theme || 'light'); if (App.els.themeSelect) App.els.themeSelect.value = App.state.app.settings.theme || 'light'; },
+      applyTheme() {
+        const theme = App.themeBridge.effective();
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        App.state.app.settings.theme = theme;
+        if (App.els.themeSelect) App.els.themeSelect.value = theme;
+      },
       applyLayout() { document.documentElement.setAttribute('data-layout', App.state.app.settings.layoutPreset || 'classic'); if (App.els.calendarLayout) App.els.calendarLayout.classList.remove('team-hidden'); },
       buildMonthGrid(month, year) {
         const monthStart = new Date(year, month, 1); const monthEnd = new Date(year, month + 1, 0); const gridStart = App.utils.startOfWeek(monthStart); const gridEnd = App.utils.addDays(App.utils.startOfWeek(monthEnd), 41 - App.utils.daysDiff(App.utils.startOfWeek(monthEnd), gridStart)); const weeks = []; let cursor = new Date(gridStart); while (cursor <= gridEnd) { const days = []; for (let i = 0; i < 7; i += 1) { const date = App.utils.addDays(cursor, i); days.push({ date, iso: App.utils.iso(date), day: date.getDate(), month: date.getMonth(), inMonth: date.getMonth() === month, isWeekend: date.getDay() === 0 || date.getDay() === 6, isToday: App.utils.iso(date) === App.utils.iso(new Date()) }); } weeks.push({ id: App.utils.weekIdForDate(cursor), start: new Date(cursor), number: App.utils.weekNumber(cursor), days }); cursor = App.utils.addDays(cursor, 7); }
@@ -1445,6 +1475,20 @@
  @media (max-width:680px){.send-control-grid{grid-template-columns:1fr}}
  
  @media (max-width:680px){.day-popover{left:12px !important;right:12px !important;top:auto !important;bottom:86px !important;max-width:none;width:auto}.day-popover-actions .btn{flex:1 1 auto}}
+
+ /* Phase 6 shell overrides live in this late injected block intentionally:
+    the legacy layout above uses !important and must be won in one place. */
+ @media (min-width:1201px){
+   :root[data-module="circuit-planner"] .app{grid-template-columns:280px minmax(0,1fr) !important}
+   :root[data-module="circuit-planner"] .sidebar.md-sidenav{display:flex !important;position:relative !important;left:auto !important;top:auto !important;bottom:auto !important;width:auto !important;z-index:1 !important;box-shadow:none !important}
+   :root[data-module="circuit-planner"] .mobile-menu-btn{display:none !important}
+   :root[data-module="circuit-planner"] .main{padding:0 var(--cw-space-4) var(--cw-space-6) !important}
+ }
+ @media (max-width:1200px){
+   :root[data-module="circuit-planner"] .app{grid-template-columns:1fr !important}
+   :root[data-module="circuit-planner"] .sidebar.md-sidenav{position:fixed !important;left:calc(-1 * var(--sidebar-width) - 20px) !important;top:0 !important;bottom:0 !important;width:var(--sidebar-width) !important;z-index:2500 !important}
+   :root[data-module="circuit-planner"] .app.menu-open .sidebar.md-sidenav{left:0 !important}
+ }
  
 
 `;
@@ -3132,8 +3176,8 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
       App.els.eventColorFilter?.addEventListener('change', (e) => { App.state.eventColorFilter = e.target.value; App.ui.renderEvents(); });
       App.els.eventVisitFilter?.addEventListener('change', (e) => { App.state.eventVisitFilter = e.target.value; App.ui.renderEvents(); });
       App.els.deleteAllEventsBtn?.addEventListener('click', () => App.actions.deleteAllEventTemplates());
-      App.els.themeBtn?.addEventListener('click', () => { App.state.app.settings.theme = App.state.app.settings.theme === 'dark' ? 'light' : 'dark'; App.store.save(); App.ui.renderAll(); });
-      App.els.themeSelect?.addEventListener('change', (e) => { App.state.app.settings.theme = e.target.value; App.store.save(); App.ui.renderAll(); });
+      App.els.themeBtn?.addEventListener('click', () => App.themeBridge.choose(App.themeBridge.effective() === 'dark' ? 'light' : 'dark'));
+      App.els.themeSelect?.addEventListener('change', (e) => App.themeBridge.choose(e.target.value));
       App.els.accentSelect?.addEventListener('change', (e) => { App.state.app.settings.accentColor = e.target.value; App.store.save(); App.ui.applyAccent(); });
       App.els.fontSizeSelect?.addEventListener('change', (e) => { App.state.app.settings.fontSize = e.target.value; App.store.save(); App.ui.applyFontSize(); });
       App.els.languageSelect?.addEventListener('change', (e) => { App.i18nBridge.choose(e.target.value); });
@@ -3480,6 +3524,37 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
       },
     },
 
+    themeBridge: {
+      _busy: false,
+      ready() { return typeof CWTheme !== 'undefined'; },
+      effective() {
+        return this.ready() ? CWTheme.effective() : (App.state.app.settings.theme || 'light');
+      },
+      adopt() {
+        const fallback = App.state.app.settings.theme || 'light';
+        if (!this.ready()) return;
+        CWTheme.init({ default: fallback });
+        App.state.app.settings.theme = CWTheme.effective();
+        CWTheme.onChange(() => {
+          if (this._busy) return;
+          const next = CWTheme.effective();
+          if (next === App.state.app.settings.theme) return;
+          App.state.app.settings.theme = next;
+          App.store.save();
+          App.ui.renderAll();
+        });
+      },
+      choose(value) {
+        this._busy = true;
+        try {
+          if (this.ready()) CWTheme.set(value);
+          App.state.app.settings.theme = this.ready() ? CWTheme.effective() : value;
+        } finally { this._busy = false; }
+        App.store.save();
+        App.ui.renderAll();
+      },
+    },
+
     i18nBridge: {
       MODULE: 'circuit-planner',
       HUB_VALUE: '__hub',
@@ -3551,6 +3626,7 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
     init() {
       this.ui.cacheElements();
       this.store.load();
+      this.themeBridge.adopt();
       // Сразу после load(): язык нужен раньше первого renderAll(), а
       // store.lastWrittenPayload здесь ещё показывает, была ли установка новой.
       this.i18nBridge.adopt();
