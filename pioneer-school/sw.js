@@ -1,5 +1,5 @@
 // Школа пионеров — service worker модуля.
-const APP_VERSION = '1.6.1';
+const APP_VERSION = '1.6.2';
 const CACHE_PREFIX = 'pioneer-school-cache-v';
 const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 
@@ -57,31 +57,17 @@ const ASSETS = [
   // должна собираться и без сети.
   './js/vendor/pdf-lib.min.js',
   './js/vendor/fontkit.umd.min.js',
+  './js/vendor/jspdf.umd.min.js',
+  './js/vendor/pdf.min.js',
+  './js/vendor/pdf.worker.min.js',
+  './js/vendor/xlsx.full.min.js',
   './data/seed-lessons.json'
-];
-
-// Внешние библиотеки. Без предварительного кэширования экспорт PDF/Excel и
-// импорт PDF работали только при наличии сети: на первой загрузке SW ещё не
-// управляет страницей, поэтому runtime-кэширование их не перехватывало.
-// Ошибка загрузки любой из них не должна ломать установку SW, поэтому они
-// кэшируются отдельно и «мягко».
-const CDN_ASSETS = [
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
     await cache.addAll(ASSETS);
-    await Promise.all(CDN_ASSETS.map(async (url) => {
-      try {
-        const res = await fetch(url, { mode: 'cors' });
-        if (res && res.ok) await cache.put(url, res.clone());
-      } catch (_) { /* нет сети на момент установки — подхватится в рантайме */ }
-    }));
     await self.skipWaiting();
   })());
 });

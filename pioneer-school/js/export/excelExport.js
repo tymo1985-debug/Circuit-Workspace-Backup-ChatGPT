@@ -60,7 +60,7 @@ const ExcelExport = {
   // на клиенте — Numbers полностью и корректно открывает .xlsx, поэтому один файл
   // покрывает оба случая.
   downloadStudentsXlsx(students, columns, classesById) {
-    if (!window.XLSX) { alert('Библиотека для Excel не загрузилась. Проверьте подключение к интернету.'); return; }
+    if (!window.XLSX) { alert('Библиотека для Excel не загрузилась. Обновите страницу; если ошибка повторится, переустановите PWA.'); return; }
     // В .xlsx экранирование кавычкой не нужно и мешало бы — SheetJS пишет
     // значения как текстовые ячейки, формулой они не станут.
     const { headers, rows } = this._buildStudentAoa(students, columns, classesById);

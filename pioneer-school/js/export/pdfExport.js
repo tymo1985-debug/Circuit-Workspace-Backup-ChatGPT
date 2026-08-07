@@ -9,13 +9,13 @@
 const IMG_COMPRESSION = 'SLOW';
 
 const PdfExport = {
-  // Единая проверка внешней библиотеки. Раньше при недоступном CDN
+  // Единая проверка библиотеки. Раньше при недоступном CDN
   // `const { jsPDF } = window.jspdf` падал с TypeError, и кнопка экспорта
   // просто «ничего не делала» — без единого сообщения пользователю
   // (в excelExport такая проверка уже была, здесь её не хватало).
   _requireJsPdf() {
     if (!window.jspdf || !window.jspdf.jsPDF) {
-      const message = 'Библиотека для PDF не загрузилась. Проверьте подключение к интернету и обновите страницу.';
+      const message = 'Библиотека для PDF не загрузилась. Обновите страницу; если ошибка повторится, переустановите PWA.';
       alert(message);
       throw new Error(message);
     }

@@ -39,13 +39,12 @@ const APP_SHELL_URLS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
-  // CDN libs: precache so PDF export works offline even before the second visit
-  // (on the very first load the SW doesn't control the page yet, so runtime
-  // caching alone would miss them).
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js',
-  'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
-  'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'
+  // Библиотеки экспорта хранятся локально: PDF работает при первом запуске
+  // и без доступа к CDN.
+  './vendor/jspdf.umd.min.js',
+  './vendor/jspdf.plugin.autotable.min.js',
+  './vendor/pdf-lib.min.js',
+  './vendor/fontkit.umd.min.js'
 ];
 
 self.addEventListener('install', (event) => {
