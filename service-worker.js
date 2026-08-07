@@ -20,6 +20,7 @@ const SHELL_FILES = [
   './index.html',
   './manifest.json',
   './shared/style.css',
+  './shared/theme.js',
   './shared/db.js',
   './shared/nav.js',
   './shared/backup.js',

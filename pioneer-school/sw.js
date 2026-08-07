@@ -1,5 +1,5 @@
 // Школа пионеров — service worker модуля.
-const APP_VERSION = '1.6.3';
+const APP_VERSION = '1.6.4';
 const CACHE_PREFIX = 'pioneer-school-cache-v';
 const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 
@@ -16,6 +16,7 @@ const ASSETS = [
   // Общий слой (стили + шрифты). Особенно важно здесь: раньше модуль тянул
   // шрифты с Google Fonts CDN, которые не кэшировались вовсе.
   '../shared/style.css',
+  '../shared/theme.js',
   '../shared/nav.js',
   '../shared/backup.js',
   '../shared/pwa-update.js',

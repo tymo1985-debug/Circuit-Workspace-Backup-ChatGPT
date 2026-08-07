@@ -5,7 +5,7 @@
 // Внутри хаба это стирало бы офлайн-кэши остальных модулей: Cache Storage
 // общий на весь origin. Здесь, как и в остальных модулях, удаляются строго
 // свои кэши по префиксу.
-const APP_VERSION = '5.1.1';
+const APP_VERSION = '5.1.2';
 const CACHE_PREFIX = 'appointments-cache-v';
 const CACHE_NAME = CACHE_PREFIX + APP_VERSION;
 
@@ -23,6 +23,7 @@ const ASSETS = [
   // Общий слой хаба. Без него офлайн-запуск теряет стили, кнопку возврата
   // и падает на CWI18n undefined.
   '../shared/style.css',
+  '../shared/theme.js',
   '../shared/nav.js',
   '../shared/backup.js',
   '../shared/pwa-update.js',

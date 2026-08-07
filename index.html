@@ -10,6 +10,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="shared/theme.js"></script>
+<script>CWTheme.init({ default: 'dark' });</script>
 <link rel="stylesheet" href="shared/style.css">
 <!-- Локализация подключается в <head>, а не в конце <body>: перевод должен
      примениться до первой отрисовки, иначе при неруском языке на кадр
@@ -380,6 +382,16 @@
       </div>
       <div class="cw-hub-header__tools">
         <span class="cw-lang">
+          <svg class="cw-lang__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <label class="cw-sr-only" for="hubTheme" data-i18n="theme.label">Тема</label>
+          <select class="cw-lang__select" id="hubTheme" data-i18n-title="theme.label">
+            <option value="auto" data-i18n="theme.auto">Как в системе</option>
+            <option value="light" data-i18n="theme.light">Светлая</option>
+            <option value="dark" data-i18n="theme.dark">Тёмная</option>
+          </select>
+          <svg class="cw-lang__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <span class="cw-lang">
           <svg class="cw-lang__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/></svg>
           <label class="cw-sr-only" for="hubLanguage" data-i18n="hub.language_label">Язык интерфейса</label>
           <select class="cw-lang__select" id="hubLanguage" data-i18n-title="hub.language_label"></select>
@@ -560,6 +572,16 @@
 
     // Смена языка в другой вкладке (событие storage) — держим селект в курсе.
     CWI18n.onChange(function (lang) { select.value = lang; });
+  })();
+
+  // --- Общая тема -----------------------------------------------------
+  (function () {
+    var select = document.getElementById('hubTheme');
+    select.value = CWTheme.get();
+    select.addEventListener('change', function (event) {
+      CWTheme.set(event.target.value);
+    });
+    CWTheme.onChange(function (theme) { select.value = theme; });
   })();
 
   // Инициализируем общую БД заранее, чтобы модули, подключающие CWDB,
