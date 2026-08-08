@@ -1,15 +1,15 @@
 /**
- * Клиндарий — аудит видимой локализации.
+ * Клиндарий — точечный compatibility-аудит видимой локализации.
  *
- * Step 30: переводы вынесены в i18n/audit.js. Здесь остаётся только
- * диагностический DOM-механизм для legacy-строк, которые ещё создаёт app.js.
+ * Step 31: глобальный MutationObserver удалён. Legacy-строки проверяются только
+ * после трёх конкретных рендеров старого app.js, где они пока ещё создаются:
+ * детали события, окно напоминаний и списки формуляра визита.
  */
 (function () {
   'use strict';
 
   if (window.CWKlindariyAuditRuntimeLoaded) return;
   window.CWKlindariyAuditRuntimeLoaded = true;
-
 
   function installVisibleI18nAudit(app) {
     const textKeyByOriginal = new Map([
@@ -28,14 +28,13 @@
     const trackedText = new Map();
     const trackedAttrs = new Map();
     const nativeLanguageSelects = new Set(['languageSelect','vfLanguageSelect','eventFormLanguageSelect']);
-
     const translate = (key) => app.utils.t(key);
 
     const skipTextNode = (node) => {
-      const parent = node.parentElement;
+      const parent = node?.parentElement;
       if (!parent) return true;
       if (['SCRIPT','STYLE','TEXTAREA'].includes(parent.tagName)) return true;
-      if (parent.closest('[contenteditable="true"]')) return true;
+      if (parent.closest?.('[contenteditable="true"]')) return true;
       if (parent.tagName === 'OPTION' && nativeLanguageSelects.has(parent.parentElement?.id)) return true;
       return false;
     };
@@ -44,9 +43,7 @@
       if (!node?.isConnected || skipTextNode(node)) return;
       const raw = node.nodeValue || '';
       const match = raw.match(/^(\s*)(.*?)(\s*)$/s);
-      const lead = match?.[1] || '';
-      const trail = match?.[3] || '';
-      node.nodeValue = lead + translate(key) + trail;
+      node.nodeValue = (match?.[1] || '') + translate(key) + (match?.[3] || '');
     };
 
     const inspectTextNode = (node) => {
@@ -55,8 +52,7 @@
         applyTextNode(node, trackedText.get(node));
         return;
       }
-      const trimmed = (node.nodeValue || '').trim();
-      const key = textKeyByOriginal.get(trimmed);
+      const key = textKeyByOriginal.get((node.nodeValue || '').trim());
       if (!key) return;
       trackedText.set(node, key);
       applyTextNode(node, key);
@@ -75,7 +71,7 @@
       });
     };
 
-    const scan = (root = document.body) => {
+    const scan = (root) => {
       if (!root) return;
       if (root.nodeType === Node.TEXT_NODE) inspectTextNode(root);
       if (root.nodeType === Node.ELEMENT_NODE) inspectElementAttrs(root);
@@ -86,6 +82,15 @@
         else inspectElementAttrs(node);
       }
     };
+
+    const knownRoots = () => [
+      app.els?.calendarSideDetails,
+      app.els?.remindersModalList,
+      app.els?.vfMeetingsList,
+      app.els?.vfServiceDaysList,
+      app.els?.vfPastoralList,
+      app.els?.vfMealsList,
+    ].filter(Boolean);
 
     const reapply = () => {
       for (const [node, key] of Array.from(trackedText.entries())) {
@@ -107,7 +112,7 @@
           el.setAttribute(attr, translate(key).replace(/^[📋⋯]\s*/, ''));
         }
       }
-      scan(document.body);
+      knownRoots().forEach(scan);
     };
 
     const report = () => {
@@ -116,7 +121,7 @@
       const leaks = [];
       const selectors = 'button,summary,label,h1,h2,h3,h4,.small,.hint,.side-label,.modal-sub';
       document.querySelectorAll(selectors).forEach((el) => {
-        if (el.closest('textarea,[contenteditable="true"]')) return;
+        if (el.closest?.('textarea,[contenteditable="true"]')) return;
         const value = (el.textContent || '').trim();
         if (!value || !/[\u0400-\u04FF]/.test(value)) return;
         leaks.push(value.slice(0, 140));
@@ -126,16 +131,35 @@
       return unique;
     };
 
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((m) => {
-        if (m.type === 'characterData') inspectTextNode(m.target);
-        m.addedNodes.forEach((node) => scan(node));
-      });
-    });
+    const scanAfterRender = (roots) => {
+      const run = () => roots().filter(Boolean).forEach(scan);
+      if (typeof queueMicrotask === 'function') queueMicrotask(run);
+      else setTimeout(run, 0);
+    };
+
+    const wrapRenderer = (name, roots) => {
+      const original = app.ui?.[name];
+      if (typeof original !== 'function' || original.__cwI18nTargeted) return;
+      const wrapped = function (...args) {
+        const result = original.apply(this, args);
+        scanAfterRender(roots);
+        return result;
+      };
+      Object.defineProperty(wrapped, '__cwI18nTargeted', { value: true });
+      app.ui[name] = wrapped;
+    };
+
+    wrapRenderer('renderCalendarDetails', () => [app.els?.calendarSideDetails]);
+    wrapRenderer('renderRemindersModal', () => [app.els?.remindersModalList]);
+    wrapRenderer('renderVisitFormLists', () => [
+      app.els?.vfMeetingsList,
+      app.els?.vfServiceDaysList,
+      app.els?.vfPastoralList,
+      app.els?.vfMealsList,
+    ]);
 
     setTimeout(() => {
-      scan(document.body);
-      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+      knownRoots().forEach(scan);
       if (typeof CWI18n !== 'undefined' && CWI18n.onChange) {
         CWI18n.onChange(() => setTimeout(() => {
           reapply();
@@ -145,7 +169,12 @@
       setTimeout(report, 50);
     }, 0);
 
-    window.CWI18nAudit = { scan: () => scan(document.body), report, reapply };
+    window.CWI18nAudit = {
+      mode: 'targeted-renderers',
+      scan: () => knownRoots().forEach(scan),
+      report,
+      reapply,
+    };
   }
 
   if (typeof window.CWKlindariyRegisterPreInitHook !== 'function') {
