@@ -869,9 +869,6 @@ Mit brüderlichen Grüßen
         }
 
         if (app && app.config) {
-          // Шаг 24: версия поднимается до публикации App.init(), поэтому badge,
-          // document.title и meta получают один и тот же номер.
-          app.config.version = '9.61.2';
           app.config.monthNames.de = [
             'Januar','Februar','März','April','Mai','Juni',
             'Juli','August','September','Oktober','November','Dezember'
