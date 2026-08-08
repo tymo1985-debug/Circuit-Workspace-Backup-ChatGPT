@@ -1,13 +1,10 @@
 /**
  * Назначения — словарь модуля.
  *
- * ГРАНИЦА, КОТОРУЮ НЕЛЬЗЯ РАЗМЫВАТЬ: здесь переводится только интерфейс.
- * Текст письма («Раді старійшин», «Тема: Призначення і викреслення…»,
- * «Ваш брат») живёт в разметке index.html и в js/app.js и остаётся
- * украинским при любом языке интерфейса — это готовый документ, который
- * отправляют в собрание. Секретарь может работать в польском интерфейсе и
- * печатать украинское письмо: это нормальный рабочий случай, тот же, что в
- * Конгрессах с языком писем.
+ * Интерфейсные строки (`ap.*`) переводятся языком интерфейса.
+ * Строки письма (`doc.ap.*`) переводятся отдельно языком ДОКУМЕНТА через
+ * `shared/doclang.js`. Поэтому язык интерфейса и язык печатного письма
+ * независимы друг от друга.
  *
  * Название и описание модуля здесь отсутствуют намеренно: они лежат в
  * shared/i18n/common.js под ключами module.appointments.title/desc — одно
@@ -53,20 +50,20 @@
       'ap.doc.language': 'Язык письма',
       'ap.doc.language_hint': 'Язык печатного письма. От языка интерфейса не зависит.',
 
-      /* --- Текст документа. Переводится языком ДОКУМЕНТА, не интерфейса. --- */
+      /* --- Текст документа. Язык выбирается независимо от интерфейса. --- */
       'doc.ap.to_elders': 'СОВЕТУ СТАРЕЙШИН',
       'doc.ap.congregation': 'СОБРАНИЯ «{name}»',
       'doc.ap.via': 'ЧЕРЕЗ {name}',
       'doc.ap.subject': 'Тема: Назначение и вычёркивание старейшин и служителей собрания',
       'doc.ap.greeting': 'Дорогие братья!',
-      'doc.ap.appoint.pre': 'Настоящим письмом подтверждаю, что я назначил',
-      'doc.ap.appoint.post': 'следующего(-их) брата(-ьев):',
-      'doc.ap.role.elders': 'старейшиной(-ами)',
-      'doc.ap.role.servants': 'служителем(-ями) собрания',
-      'doc.ap.remove.pre': 'Настоящим письмом подтверждаю, что я',
-      'doc.ap.remove.verb': 'вычеркнул',
-      'doc.ap.remove.post': 'следующего(-их) брата(-ьев) как старейшину(-ин) или служителя(-ей) собрания:',
-      'doc.ap.closing': 'Примите мою искреннюю христианскую любовь и наилучшие пожелания.',
+      'doc.ap.appoint.pre': 'Настоящим подтверждаю назначение указанного ниже брата (указанных ниже братьев) в качестве',
+      'doc.ap.appoint.post': ':',
+      'doc.ap.role.elders': 'старейшины (старейшин)',
+      'doc.ap.role.servants': 'служителя (служителей) собрания',
+      'doc.ap.remove.pre': 'Настоящим подтверждаю',
+      'doc.ap.remove.verb': 'вычёркивание',
+      'doc.ap.remove.post': 'указанного ниже брата (указанных ниже братьев) из числа старейшин или служителей собрания:',
+      'doc.ap.closing': 'С искренней христианской любовью и наилучшими пожеланиями.',
       'doc.ap.signoff': 'Ваш брат,',
       'doc.ap.print.appointed': 'назначение',
       'doc.ap.print.removed': 'вычёркивание',
@@ -102,7 +99,7 @@
       'ap.doc.language': 'Мова листа',
       'ap.doc.language_hint': 'Мова друкованого листа. Від мови інтерфейсу не залежить.',
 
-      /* --- Текст документа. Переводится языком ДОКУМЕНТА, не интерфейса. --- */
+      /* --- Текст документа. Язык выбирается независимо от интерфейса. --- */
       'doc.ap.to_elders': 'РАДІ СТАРІЙШИН',
       'doc.ap.congregation': 'ЗБОРУ «{name}»',
       'doc.ap.via': 'ЧЕРЕЗ {name}',
@@ -213,20 +210,20 @@
       'ap.doc.language': 'Sprache des Briefes',
       'ap.doc.language_hint': 'Sprache des gedruckten Briefes. Unabhängig von der Oberflächensprache.',
 
-      /* --- Текст документа. Переводится языком ДОКУМЕНТА, не интерфейса. --- */
+      /* --- Текст документа. Язык выбирается независимо от интерфейса. --- */
       'doc.ap.to_elders': 'AN DIE ÄLTESTENSCHAFT',
       'doc.ap.congregation': 'DER VERSAMMLUNG „{name}“',
       'doc.ap.via': 'ÜBER {name}',
       'doc.ap.subject': 'Betreff: Ernennung und Streichung von Ältesten und Dienstamtgehilfen',
       'doc.ap.greeting': 'Liebe Brüder!',
-      'doc.ap.appoint.pre': 'Hiermit bestätige ich, dass ich folgende(n) Bruder/Brüder als',
-      'doc.ap.appoint.post': 'ernannt habe:',
-      'doc.ap.role.elders': 'Ältesten',
-      'doc.ap.role.servants': 'Dienstamtgehilfen',
-      'doc.ap.remove.pre': 'Hiermit bestätige ich, dass ich folgende(n) Bruder/Brüder als Ältesten oder Dienstamtgehilfen',
-      'doc.ap.remove.verb': 'gestrichen',
-      'doc.ap.remove.post': 'habe:',
-      'doc.ap.closing': 'Nehmt meine herzliche christliche Liebe und die besten Wünsche entgegen.',
+      'doc.ap.appoint.pre': 'Hiermit bestätige ich die Ernennung des unten genannten Bruders bzw. der unten genannten Brüder als',
+      'doc.ap.appoint.post': ':',
+      'doc.ap.role.elders': 'Ältester beziehungsweise Älteste',
+      'doc.ap.role.servants': 'Dienstamtgehilfe beziehungsweise Dienstamtgehilfen',
+      'doc.ap.remove.pre': 'Hiermit bestätige ich die',
+      'doc.ap.remove.verb': 'Streichung',
+      'doc.ap.remove.post': 'des unten genannten Bruders bzw. der unten genannten Brüder aus dem Kreis der Ältesten oder Dienstamtgehilfen:',
+      'doc.ap.closing': 'Mit herzlicher christlicher Liebe und den besten Wünschen.',
       'doc.ap.signoff': 'Euer Bruder,',
       'doc.ap.print.appointed': 'Ernennung',
       'doc.ap.print.removed': 'Streichung',
