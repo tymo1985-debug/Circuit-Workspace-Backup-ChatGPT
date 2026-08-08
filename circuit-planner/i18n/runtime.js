@@ -1,9 +1,8 @@
 /**
  * Клиндарий — аудит видимой локализации.
  *
- * Step 29: немецкий интерфейс живёт в i18n/de.js, немецкие документы —
- * в i18n/de-docs.js. Здесь остаётся только диагностический compatibility layer
- * для динамических строк, которые всё ещё создаются старым app.js.
+ * Step 30: переводы вынесены в i18n/audit.js. Здесь остаётся только
+ * диагностический DOM-механизм для legacy-строк, которые ещё создаёт app.js.
  */
 (function () {
   'use strict';
@@ -11,43 +10,6 @@
   if (window.CWKlindariyAuditRuntimeLoaded) return;
   window.CWKlindariyAuditRuntimeLoaded = true;
 
-  // ---------- Schritt 25: i18n-Audit der sichtbaren Oberfläche ----------
-  // Здесь только общие UI-слова. JW-термины продолжают приходить из основного
-  // словаря/немецкого слоя, уже сверенного по jw.org.
-  const AUDIT_I18N = {
-    ru: {
-      'cp.audit.more_actions': '⋯ Ещё действия',
-      'cp.audit.generate_s302': '📋 Сформировать S-302',
-      'cp.audit.generate_send_s302': '📋 Сформировать и отправить S-302',
-      'cp.audit.day': 'День',
-    },
-    uk: {
-      'cp.audit.more_actions': '⋯ Інші дії',
-      'cp.audit.generate_s302': '📋 Сформувати S-302',
-      'cp.audit.generate_send_s302': '📋 Сформувати й надіслати S-302',
-      'cp.audit.day': 'День',
-    },
-    en: {
-      'cp.audit.more_actions': '⋯ More actions',
-      'cp.audit.generate_s302': '📋 Generate S-302',
-      'cp.audit.generate_send_s302': '📋 Generate and send S-302',
-      'cp.audit.day': 'Day',
-    },
-    pl: {
-      'cp.audit.more_actions': '⋯ Więcej działań',
-      'cp.audit.generate_s302': '📋 Utwórz S-302',
-      'cp.audit.generate_send_s302': '📋 Utwórz i wyślij S-302',
-      'cp.audit.day': 'Dzień',
-    },
-    de: {
-      'cp.audit.more_actions': '⋯ Weitere Aktionen',
-      'cp.audit.generate_s302': '📋 S-302 erstellen',
-      'cp.audit.generate_send_s302': '📋 S-302 erstellen und senden',
-      'cp.audit.day': 'Tag',
-    },
-  };
-
-  if (typeof CWI18n !== 'undefined') CWI18n.register(AUDIT_I18N);
 
   function installVisibleI18nAudit(app) {
     const textKeyByOriginal = new Map([
