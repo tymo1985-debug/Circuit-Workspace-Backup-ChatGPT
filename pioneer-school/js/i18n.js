@@ -4,16 +4,12 @@
 // перевод доступен как глобальная функция T(key, vars). Имя короткое
 // намеренно: в app.js оно встречается в шаблонных строках сотни раз.
 //
-// Разрешение языка целиком на общем слое:
+// Разрешение языка интерфейса целиком на общем слое:
 //   localStorage['cw-lang:pioneer-school'] → свой выбор, если пользователь его сделал;
 //   иначе localStorage['cw-lang'] → язык, заданный в Circuit Workspace.
-// В IndexedDB модуля язык интерфейса не хранится намеренно: он не часть
-// данных школы и не должен попадать в резервные копии.
 //
-// ЧТО ЭТОТ СЛОЙ НЕ ПЕРЕВОДИТ (осознанно, см. шапку i18n/dict.js):
-// генераторы документов (pdfExport, pdfFormExport, excelExport), схему
-// анкеты registrationSchema.js и страницу register.html. Это готовые бумаги,
-// их язык — свойство документа, а не оболочки.
+// Язык ДОКУМЕНТА подключается отдельно через shared/doclang.js. Он не следует
+// за интерфейсом и хранится под cw-doclang:pioneer-school.
 
 const PSI18n = {
   MODULE: 'pioneer-school',
@@ -36,12 +32,6 @@ const PSI18n = {
     else CWI18n.setLang(value, { scope: 'module' });
   },
 
-  // Подписи столбцов учащихся живут в Students.label() (students.js): там
-  // правильный приоритет — labelKey, если столбец не переименовывали, и
-  // собственное название пользователя, если переименовывали. Дубля здесь
-  // намеренно нет: у него приоритет был обратный (label раньше labelKey),
-  // то есть перевод никогда бы не применился.
-
   applyTitle() {
     const version = (self.CW_MODULES && self.CW_MODULES[this.MODULE] && self.CW_MODULES[this.MODULE].version) || '';
     document.title = this.t('module.pioneer-school.title') + (version ? ' v' + version : '');
@@ -54,6 +44,44 @@ const PSI18n = {
       .concat(CWI18n.LANGS.map((l) => ({ code: l.code, label: l.label })));
     select.innerHTML = options.map((o) => `<option value="${o.code}">${o.label}</option>`).join('');
     select.value = this.currentValue();
+  },
+
+  _loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const absolute = new URL(src, document.baseURI).href;
+      const existing = Array.from(document.scripts).find((s) => s.src === absolute);
+      if (existing) {
+        if (existing.dataset.psLoaded === '1' || existing.readyState === 'complete') return resolve();
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', () => reject(new Error(`Не удалось загрузить ${src}`)), { once: true });
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = src;
+      script.dataset.psDocLayer = '1';
+      script.addEventListener('load', () => {
+        script.dataset.psLoaded = '1';
+        resolve();
+      }, { once: true });
+      script.addEventListener('error', () => reject(new Error(`Не удалось загрузить ${src}`)), { once: true });
+      document.head.appendChild(script);
+    });
+  },
+
+  async initDocumentLanguageLayer() {
+    if (window.PSDocLang) {
+      window.PSDocLang.init();
+      return;
+    }
+    const scripts = [
+      '../shared/doclang.js',
+      'i18n/doc.js',
+      'js/doclang.js',
+      'js/documents-i18n.js'
+    ];
+    for (const src of scripts) await this._loadScript(src);
+    if (!window.PSDocLang) throw new Error('PSDocLang не инициализирован');
+    window.PSDocLang.init();
   },
 
   /**
@@ -80,15 +108,16 @@ const PSI18n = {
 
     const select = document.getElementById('ui-language');
     if (select) select.addEventListener('change', (e) => { this.choose(e.target.value); apply(); });
+
+    // Документный слой грузится после полной загрузки синхронных скриптов
+    // страницы. Он не блокирует интерфейс и не вмешивается в язык оболочки.
+    this.initDocumentLanguageLayer().catch((error) => {
+      console.error('pioneer-school: document language layer failed', error);
+    });
   },
 };
 
-// Короткий псевдоним для шаблонных строк.
 function T(key, vars) { return PSI18n.t(key, vars); }
 
-// Модуль везде придерживается правила «const X + window.X = X» (см. db.js,
-// students.js): между обычными <script> глобальный const виден и так, но без
-// явного экспорта объект пропадает, как только файл выполняется в другом
-// контексте — например, в тестовой песочнице или под бандлером.
 window.PSI18n = PSI18n;
 window.T = T;
