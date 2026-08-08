@@ -1,35 +1,69 @@
 /**
  * Клиндарий — pre-app bootstrap + регистрация PWA.
  *
- * Шаг 26: локализация вынесена в i18n/runtime.js. Здесь остаётся только
- * детерминированная загрузка pre-init runtime и PWA lifecycle.
+ * Step 28: один общий pre-init hook-механизм подключает независимые i18n-модули.
+ * i18n/de.js отвечает за немецкий интерфейс; i18n/runtime.js — за временный
+ * документный compatibility layer и аудит. app.js остаётся владельцем App и версии.
  */
 (function () {
   'use strict';
 
-  function loadI18nRuntime() {
-    if (window.CWKlindariyI18nRuntimeLoaded) return;
+  const preInitHooks = [];
+  window.CWKlindariyRegisterPreInitHook = function (hook) {
+    if (typeof hook === 'function') preInitHooks.push(hook);
+  };
+
+  function loadPreInitScript(relativeUrl, loadedFlag) {
+    if (loadedFlag && window[loadedFlag]) return;
     const current = document.currentScript;
     const base = current?.src || window.location.href;
-    const url = new URL('../i18n/runtime.js', base);
+    const url = new URL(relativeUrl, base);
     const request = new XMLHttpRequest();
     request.open('GET', url.href, false);
     request.send(null);
     const ok = (request.status >= 200 && request.status < 300) || request.status === 0;
     if (!ok || !request.responseText) {
-      throw new Error(`i18n runtime HTTP ${request.status || 'error'}`);
+      throw new Error(`${relativeUrl} HTTP ${request.status || 'error'}`);
     }
-    // Indirect eval executes the already wrapped runtime in global scope. The file is
-    // same-origin and part of the app shell; no user-controlled source is evaluated.
+    // Same-origin app-shell source only; executed before app.js in deterministic order.
     (0, eval)(`${request.responseText}
 //# sourceURL=${url.href}`);
   }
 
   try {
-    loadI18nRuntime();
+    loadPreInitScript('../i18n/de.js', 'CWKlindariyGermanUiLoaded');
+    loadPreInitScript('../i18n/runtime.js', 'CWKlindariyDocumentRuntimeLoaded');
   } catch (error) {
-    console.error('Klindariy i18n runtime failed to load', error);
+    console.error('Klindariy pre-init i18n failed to load', error);
   }
+
+  // app.js publishes its local const App as window.App immediately before App.init().
+  // Keep exactly one interception point and let modules register small independent hooks.
+  let publishedApp = null;
+  Object.defineProperty(window, 'App', {
+    configurable: true,
+    enumerable: true,
+    get() { return publishedApp; },
+    set(app) {
+      publishedApp = app;
+      try {
+        for (const hook of preInitHooks) {
+          try {
+            hook(app);
+          } catch (error) {
+            console.error('Klindariy pre-init hook failed', error);
+          }
+        }
+      } finally {
+        Object.defineProperty(window, 'App', {
+          value: app,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
+      }
+    }
+  });
 
   // ---------- Регистрация и обновление PWA ----------
   if (!('serviceWorker' in navigator)) return;
