@@ -1,5 +1,7 @@
 // Service Worker for Service Year Planner
 // Auto-update app shell without manual VERSION bumps.
+// Step 23: German interface bootstrap lives in js/pwa.js; changing this worker
+// forces a fresh install so the updated pre-app bootstrap is precached immediately.
 // index.html / app.js / manifest / sw.js -> network-first
 // images/fonts -> cache-first
 // everything else -> stale-while-revalidate
@@ -20,19 +22,13 @@ const APP_SHELL_URLS = [
   './forms/s302-form.js',
   './favicon.ico',
   './manifest.webmanifest',
-  // Общий слой (стили + шрифты). Без него офлайн модуль терял оформление,
-  // т.к. index.html ссылается на ../shared/style.css.
   '../shared/style.css',
   '../shared/theme.js',
   '../shared/nav.js',
   '../shared/backup.js',
-  // Локализация: скрипты синхронные и в <head>, без них офлайн-запуск
-  // модуля упал бы на CWI18n undefined ещё до отрисовки.
   '../shared/i18n.js','../shared/sender.js',
   '../shared/doclang.js',
   '../shared/i18n/common.js',
-  // Словарь модуля: с фазы 5 он живёт отдельным файлом, а не внутри app.js.
-  // Без него офлайн-запуск дал бы интерфейс из голых ключей.
   './i18n/dict.js',
   '../shared/fonts/roboto-latin-400-normal.woff2',
   '../shared/fonts/roboto-latin-500-normal.woff2',
@@ -41,8 +37,6 @@ const APP_SHELL_URLS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
-  // Библиотеки экспорта хранятся локально: PDF работает при первом запуске
-  // и без доступа к CDN.
   './vendor/jspdf.umd.min.js',
   './vendor/jspdf.plugin.autotable.min.js',
   './vendor/pdf-lib.min.js',
@@ -56,9 +50,7 @@ self.addEventListener('install', (event) => {
       try {
         const req = new Request(url, { cache: 'reload' });
         const res = await fetch(req);
-        if (res && res.ok) {
-          await cache.put(url, res.clone());
-        }
+        if (res && res.ok) await cache.put(url, res.clone());
       } catch (_) {
         // Ignore missing assets to keep install robust.
       }
@@ -74,17 +66,13 @@ self.addEventListener('activate', (event) => {
       keys.map((key) => {
         const isCurrent = key === CACHE_STATIC || key === CACHE_RUNTIME;
         const isLegacy = key.startsWith('static-') || key.startsWith('runtime-') || key.startsWith('syp-v');
-        if (!isCurrent && isLegacy) {
-          return caches.delete(key);
-        }
+        if (!isCurrent && isLegacy) return caches.delete(key);
         return Promise.resolve(false);
       })
     );
 
     if ('navigationPreload' in self.registration) {
-      try {
-        await self.registration.navigationPreload.enable();
-      } catch (_) {}
+      try { await self.registration.navigationPreload.enable(); } catch (_) {}
     }
 
     await self.clients.claim();
@@ -122,19 +110,11 @@ function isAppShellRequest(request) {
 async function cacheFirst(request) {
   const cached = await caches.match(request);
 
-  // Revalidate in the background even on a cache hit, so replacing an icon/font
-  // file (without also touching sw.js) eventually reaches returning users
-  // instead of being served from cache forever.
-  // Write into CACHE_STATIC (not RUNTIME): these same-origin fonts/icons are
-  // precached there at install, and putting revalidated copies into a second
-  // cache would double the ~3.4 MB font payload in storage.
   const revalidate = fetch(request)
     .then(async (res) => {
       if (res && res.ok) {
         const cache = await caches.open(CACHE_STATIC);
-        try {
-          await cache.put(request, res.clone());
-        } catch (_) {}
+        try { await cache.put(request, res.clone()); } catch (_) {}
       }
       return res;
     })
@@ -153,9 +133,7 @@ async function networkFirst(request, fallbackUrl = './index.html') {
   try {
     const res = await fetch(request, { cache: 'no-cache' });
     if (res && res.ok) {
-      try {
-        await cache.put(request, res.clone());
-      } catch (_) {}
+      try { await cache.put(request, res.clone()); } catch (_) {}
     }
     return res;
   } catch (_) {
@@ -176,24 +154,15 @@ async function staleWhileRevalidate(request) {
     .then(async (res) => {
       if (res && res.ok) {
         const cache = await caches.open(CACHE_RUNTIME);
-        try {
-          await cache.put(request, res.clone());
-        } catch (_) {}
+        try { await cache.put(request, res.clone()); } catch (_) {}
       }
       return res;
     })
     .catch(() => cached);
 
-  // Never resolve respondWith() with undefined: if there is no cached copy and
-  // the network fails, return a proper error Response instead of a TypeError.
   return cached || fetchPromise.then((res) => res || Response.error());
 }
 
-// Serves from cache immediately when available — this is the core of making the app
-// reliably usable with no connection at all, not just resilient to a failed request.
-// Revalidates in the background so a connected session still picks up updates; only
-// falls through to the network (via networkFirst's own fallback chain) on the very
-// first visit, before anything has been cached yet.
 async function offlineFirst(request, fallbackUrl) {
   const cached = await caches.match(request);
   if (cached) {
@@ -230,11 +199,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Font bundles are .js files (destination === 'script'), so without this
-  // explicit path check they would fall into the app-shell branch below,
-  // contradicting the cache-first promise above and hitting the network on every
-  // load for ~3.4 MB of rarely-changing assets. cacheFirst still revalidates in
-  // the background, so a replaced font eventually reaches returning users.
   if (isSameOrigin(url) && (url.pathname.includes('/fonts/') || ['image', 'font'].includes(request.destination))) {
     event.respondWith(cacheFirst(request));
     return;
