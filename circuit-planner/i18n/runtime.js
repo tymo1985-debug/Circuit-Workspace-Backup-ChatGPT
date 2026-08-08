@@ -1,0 +1,1286 @@
+/**
+ * Клиндарий — pre-init runtime локализации.
+ *
+ * Шаг 26: немецкий интерфейс, немецкий документный слой и видимый i18n-аудит
+ * вынесены из js/pwa.js в отдельный файл. Поведение шагов 23–25 сохранено.
+ *
+ * Файл должен выполниться ДО app.js: он регистрирует словари и расширяет App
+ * непосредственно перед App.init(). js/pwa.js отвечает только за загрузку этого
+ * runtime и регистрацию/обновление PWA.
+ */
+(function () {
+  'use strict';
+
+  if (window.CWKlindariyI18nRuntimeLoaded) return;
+  window.CWKlindariyI18nRuntimeLoaded = true;
+
+  // ---------- Немецкий интерфейс ----------
+  // Термины, специфичные для Свидетелей Иеговы, сверяются только по jw.org:
+  // Versammlung, Kreisaufseher, Dienstjahr, Hirtenbesuch, Predigtdienst,
+  // Älteste, Dienstamtgehilfen, Pionier и др.
+  const DE = {
+    'cp.page_no': 'Seite {n}:',
+    'cp.delete_page': 'Seite löschen',
+    'cp.layout_classic': 'Klassisch',
+    'cp.layout_compact': 'Kompakt',
+    'cp.layout_spacious': 'Großzügig',
+    'cp.ph_congregation': 'Name der Versammlung, Gruppe oder Vorgruppe dieses Besuchs',
+    'cp.ph_cong_number': 'Versammlungsnummer (Feld „Versammlungs-Nr.“ in der Ereigniskarte, falls ausgefüllt)',
+    'cp.ph_cong_number_suffix': 'Dasselbe, bereits in Klammern mit einem Leerzeichen davor — praktisch direkt nach dem Namen',
+    'cp.ph_start_date': 'Beginn des Besuchs',
+    'cp.ph_end_date': 'Ende des Besuchs',
+    'cp.ph_today': 'Heutiges Datum beim Erstellen des Briefes',
+    'cp.ph_sender': 'Dein Name aus dem Feld „Dein Name“ oben',
+    'cp.ph_contact_name': 'Name der Kontaktperson aus der Versammlungs-/Gruppenkarte (Feld „Name“ unter „Kontakt“) — praktisch für Briefe an eine Gruppe oder Vorgruppe',
+    'cp.add_meeting': '+ Termin hinzufügen',
+    'cp.add_day': '+ Tag hinzufügen',
+    'cp.add_meal': '+ Mahlzeit hinzufügen',
+    'cp.add_visit_row': '+ Besuch hinzufügen',
+    'cp.add_page': '+ Seite hinzufügen',
+    'cp.add_event': '+ Neue Versammlung',
+    'cp.fs_80': '80% — Sehr klein',
+    'cp.fs_85': '85% — Klein',
+    'cp.fs_90': '90% — Kompakt',
+    'cp.fs_95': '95% — Etwas kleiner',
+    'cp.fs_100': '100% — Normal',
+    'cp.fs_105': '105% — Etwas größer',
+    'cp.fs_110': '110% — Groß',
+    'cp.fs_115': '115% — Sehr groß',
+    'cp.fs_120': '120% — Maximal',
+    'cp.fs_125': '125% — Riesig',
+    'cp.sender_email_label': 'E-Mail (im Briefkopf)',
+    'cp.sender_address_label': 'Adresse (im Briefkopf)',
+    'cp.sender_phone_label': 'Telefon (im Briefkopf)',
+    'cp.sender_name_label': 'Dein Name (für die Unterschrift und den Briefkopf)',
+    'cp.sender_section': 'Absender und Briefkopf',
+    'cp.letter_addressee': 'Adressat (erste Zeile des Briefes)',
+    'cp.letter_text': 'Brieftext',
+    'cp.letter_subject': 'Betreff',
+    'cp.email_text': 'Text der E-Mail',
+    'cp.email_text_default': 'Standardtext der E-Mail',
+    'cp.send_method': 'Versandart',
+    'cp.mail_client': 'E-Mail-Programm (mailto)',
+    'cp.owa_link': 'OWA-Link zum Verfassen der E-Mail',
+    'cp.letter_page1': 'Seite 1 — der Brief',
+    'cp.letter_extra_pages': 'Zusätzliche Seiten (2, 3 …)',
+    'cp.reset_to_default': 'Auf Standard zurücksetzen',
+    'cp.reset_salutation': 'Anrede auf Standard zurücksetzen',
+    'cp.reset_page1': 'Seite 1 auf Standard zurücksetzen',
+    'cp.replace_with_default': '↺ Durch aktuellen Standardtext ersetzen',
+    'cp.placeholder_word': 'Platzhalter',
+    'cp.what_is_it': 'Bedeutung',
+    'cp.example': 'Beispiel',
+    'cp.letter_tab': '✉ Brief',
+    'cp.letter_before_visit': '✉ Brief vor dem Besuch',
+    'cp.visit_type_label': 'Besuchsart (für S-302-/Brief-Erinnerungen)',
+    'cp.not_a_visit': 'Kein Besuch (normaler Eintrag)',
+    'cp.no_visit_type': '⚠️ Keine Besuchsart',
+    'cp.visit_form_btn': '📋 Besuchsformular',
+    'cp.meetings_schedule': 'Terminplan',
+    'cp.pastoral_visits': 'Hirtenbesuche',
+    'cp.meals': 'Mahlzeiten',
+    'cp.service_plan': 'Plan für den Predigtdienst',
+    'cp.vf_lang_label': '🌐 Formularsprache (kann von der Sprache der Benutzeroberfläche abweichen)',
+    'cp.vf_lang_default': '🌐 Standardsprache des Besuchsformulars',
+    'cp.as_interface_lang': 'Wie die Benutzeroberfläche',
+    'cp.event_note': 'Notiz zur Versammlung/Gruppe',
+    'cp.contact_name_label': 'Name der Kontaktperson',
+    'cp.contact_section': 'Kontaktperson (optional)',
+    'cp.cong_number_label': 'Versammlungsnummer (für Briefe, optional)',
+    'cp.calendar_grid': 'Kalenderraster',
+    'cp.day_week_details': 'Details zu Tag / Woche',
+    'cp.event_word': 'Ereignis',
+    'cp.all_entries': 'Alle Einträge',
+    'cp.shown_0_of_0': 'Angezeigt: 0 von 0',
+    'cp.holidays_toggle': 'Feiertage CZ/AT/DE',
+    'cp.reminders_popup': 'Erinnerungsfenster beim Start anzeigen',
+    'cp.autoplan_section': 'Automatische Planung',
+    'cp.autoplan_btn': '🗓 Auto-Plan',
+    'cp.autoplan_run': 'Verteilen und erstellen',
+    'cp.autoplan_hint': 'Versammlungen auswählen — die App verteilt sie auf die freien Wochen.',
+    'cp.home_place': 'Wohnort (für die automatische Planung)',
+    'cp.home_city': 'Wohnort',
+    'cp.detect_coords': '📍 Koordinaten ermitteln',
+    'cp.home_hint': 'Damit gruppiert die automatische Planung weiter entfernte Versammlungen (Deutschland, Österreich usw.) zu einer Fahrt, statt jede Woche hin- und zurückzufahren.',
+    'cp.export_print': 'Export und Drucken',
+    'cp.files': 'Dateien',
+    'cp.events_half_year': 'Versammlungen — 6 Monate',
+    'cp.list_12': 'Liste der Versammlungen für 12 Monate.',
+    'cp.list_6': 'Liste der Versammlungen für 6 Monate.',
+    'cp.list_month': 'Liste der Versammlungen für den aktuellen Monat.',
+    'cp.list_range': 'Liste der Ereignisse für einen beliebigen Zeitraum.',
+    'cp.list_year': 'Besuchsplan nach Versammlungen für das Dienstjahr.',
+    'cp.list_table': 'Tabellarische Übersicht für das Dienstjahr.',
+    'cp.ics_hint': 'In die .ics-Datei wird der ausgewählte Zeitraum exportiert.',
+    'cp.range_hint': 'Start- und Enddatum auswählen.',
+    'cp.print_popup_hint': 'Wenn das Druckfenster nicht erscheint, Pop-ups/Drucken im Browser erlauben.',
+    'cp.ics_import_hint': 'Tipp: In Google Kalender „Einstellungen → Importieren & Exportieren → Importieren“ öffnen und die .ics-Datei auswählen. In Apple Kalender die Datei einfach öffnen.',
+    'cp.sync_section': 'Synchronisierung',
+    'cp.open_drive': '📁 Google Drive öffnen',
+    'cp.sync_hint': 'Ohne API: Auf dem Hauptcomputer die Synchronisierungsdatei herunterladen und in Google Drive ablegen. Auf dem anderen Gerät die Datei aus Drive herunterladen und hier laden.',
+    'cp.attach_pdf': '📄 PDF-Dokument anhängen',
+    'cp.make_pdf': '📄 PDF erstellen',
+    'cp.attach_schedule': '📎 Besuchsplan anhängen',
+    'cp.send_email': '📤 E-Mail senden',
+    'cp.copy_text': '📋 Text kopieren',
+    'cp.preview_pdf': '👁 PDF-Vorschau (Beispiel)',
+    'cp.statistics': '📊 Statistik',
+    'cp.data_backup': '💾 Daten und Sicherung',
+    'cp.year_backups': 'Dienstjahr und Sicherungen',
+    'cp.history_title': 'Änderungsverlauf',
+    'cp.history_title_icon': '🕒 Änderungsverlauf',
+    'cp.history_show': '🕒 Änderungsverlauf anzeigen',
+    'cp.history_hint_short': 'Kontrollpunkte werden automatisch gespeichert, höchstens einmal alle 5 Minuten.',
+    'cp.history_hint': 'Die App speichert automatisch Kontrollpunkte (höchstens alle paar Minuten). Wenn etwas schiefgeht, kann auf einen der letzten Datenstände zurückgegangen werden.',
+    'cp.danger_zone': 'Gefahrenbereich',
+    'cp.danger_hint': 'Nicht rückgängig zu machen: Alle lokalen App-Daten werden dauerhaft gelöscht. Vorher eine Sicherung erstellen.',
+    'cp.add_year_hint': 'Erstes Jahr eingeben (z. B. 2029 für 2029/2030). Das Dienstjahr läuft vom 1. September bis 31. August.',
+    'cp.version_label': 'Version: …',
+    'cp.appearance': '🎨 Darstellung',
+    'cp.accent_color': 'Akzentfarbe',
+    'cp.font_size_label': 'Schriftgröße der Benutzeroberfläche',
+    'cp.font_size_hint': 'Ändert die Größe von Text, Schaltflächen und Kalender.',
+    'cp.accent_hint': 'Wird für Menü, Schaltflächen und Kalender verwendet.',
+    'cp.layout_hint': 'Drei Darstellungen stehen zur Verfügung: Klassisch, Kompakt (mehr Inhalt auf dem Bildschirm) und Großzügig (größer und übersichtlicher).',
+    'cp.color_green': 'Grün',
+    'cp.color_green_i': '🟢 Grün',
+    'cp.color_lightgreen_i': '🟢 Hellgrün',
+    'cp.color_blue': 'Blau',
+    'cp.color_blue_i': '🔵 Blau',
+    'cp.color_lightblue_i': '🔷 Hellblau',
+    'cp.color_indigo_i': '🔵 Indigo',
+    'cp.color_red': 'Rot',
+    'cp.color_red_i': '🔴 Rot',
+    'cp.color_scarlet_i': '🔴 Scharlachrot',
+    'cp.color_teal': 'Türkis',
+    'cp.color_teal_i': '🔹 Türkis',
+    'cp.color_darkteal_i': '🟦 Dunkeltürkis',
+    'cp.color_violet': 'Violett',
+    'cp.color_violet_i': '🟣 Violett',
+    'cp.color_purple_i': '🟣 Purpur',
+    'cp.color_orange_i': '🟠 Orange',
+    'cp.color_ginger_i': '🟠 Dunkelorange',
+    'cp.color_brown_i': '🟤 Braun',
+    'cp.color_coffee_i': '🟫 Kaffeebraun',
+    'cp.color_slate_i': '⚫ Blaugrau',
+    'cp.color_graphite': 'Graphit',
+    'cp.color_amber': 'Bernstein',
+    'cp.menu_btn': '☰ Menü',
+    'cp.more_btn': '⚙ Mehr',
+    'cp.pin_enter': '🔒 PIN eingeben',
+    'cp.size_label': 'Größe:',
+    'cp.days': 'Tage',
+    'cp.weeks': 'Wochen',
+    'cp.months': 'Monate',
+    'cp.hours': 'Stunden',
+    'cp.app_subtitle': 'Klindarium — Planer für das Dienstjahr',
+    'cp.format_hint': 'Text im Editor markieren und dann die gewünschte Schaltfläche drücken. Schriftart: Aptos',
+    'cp.format_hint2': 'Normaler Text (ohne Formatierung) wird in 11 pt und nicht fett dargestellt.',
+    'cp.letter_types_hint': 'Für jede Besuchsart gibt es einen eigenen Text. Ein Wort oder eine Formulierung in einem Editor markieren und dann „B“ oder eine Größe wählen — nur der markierte Bereich wird formatiert.',
+    'cp.placeholders_hint': 'Ein Platzhalter ist ein Wort in geschweiften Klammern, das beim Senden des Briefes automatisch durch den tatsächlichen Wert dieses Besuchs ersetzt wird. Platzhalter funktionieren im Brieftext, auf Zusatzseiten und im Standardtext der E-Mail.',
+    'cp.placeholders_toggle': '🔤 Verfügbare Platzhalter und ihre Verwendung',
+    'cp.contact_name_hint': 'Bei einer Gruppe oder Vorgruppe kann statt einer allgemeinen Anrede eine konkrete Kontaktperson verwendet werden. Dafür steht {contact_name} aus der Versammlungs-/Gruppenkarte zur Verfügung.',
+    'cp.pdf_font_hint': 'PDF-Schriftart: Aptos mit vollständiger Unterstützung für Kyrillisch. Fett und Unterstreichen funktionieren im PDF mit eingebetteten Aptos-Dateien. ⚠️ Kursiv wird derzeit nur auf dem Bildschirm angezeigt.',
+    'cp.email_default_hint': 'Wird nur für neue Besuche verwendet, für die im Versandfenster noch kein eigener Text geschrieben wurde. Der Text jedes Besuchs wird separat gespeichert. Die Platzhalter {congregation}, {start_date} und {end_date} funktionieren ebenfalls.',
+    'cp.email_entry_hint': 'Text der E-Mail für diesen Besuch. Der Brief (PDF) und der Besuchsplan werden mit den Schaltflächen unten separat angehängt; ihr Inhalt wird unter Einstellungen → Brief bearbeitet.',
+    'cp.entry_text_hint': 'Dieser Text ist nur für diesen Eintrag gespeichert und folgt ab jetzt nicht mehr Änderungen der Standardvorlage. Mit der Schaltfläche unten kann die aktuelle Standardvorlage übernommen werden; der jetzige Text wird dabei ersetzt.',
+    'cp.visit_type_hint': 'Die Besuchsart wird mit denselben Registerkarten oben gewählt (Versammlung / Gruppe / Vorgruppe).',
+    'cp.a_open_menu': 'Menü öffnen',
+    'cp.a_prev_month': 'Vorheriger Monat',
+    'cp.a_next_month': 'Nächster Monat',
+    'cp.a_search_ph': 'Nach Name, Adresse oder Zeitplan suchen',
+    'cp.a_group_color': 'Gruppe / Farbe',
+    'cp.a_visit_type': 'Besuchsart',
+    'cp.a_close': 'Schließen',
+    'cp.a_detect_coords': 'Koordinaten für die Planung ermitteln',
+    'cp.a_schedule_ph': 'Mi 19:00, Sa 10:00',
+    'cp.a_number_ph': 'Zum Beispiel: 14761',
+    'cp.a_contact_ph': 'Zum Beispiel: Bruder Johannes',
+    'cp.a_copy': 'Kopieren',
+    'cp.a_note_ph': 'Beliebige nützliche Information',
+    'cp.a_name_ph': 'Zum Beispiel: Alex Tymoshchuk',
+    'cp.a_bold': 'Fett (Text markieren)',
+    'cp.a_italic': 'Kursiv (Text markieren — siehe Hinweis unten)',
+    'cp.a_underline': 'Unterstreichen (Text markieren)',
+    'cp.a_addressee_ph': 'Zum Beispiel: An den verantwortlichen Bruder der Gruppe {congregation}',
+    'cp.a_year_ph': 'zum Beispiel 2029',
+    'cp.a_copy_subject': 'Betreff kopieren',
+    'cp.a_copy_body': 'Nachrichtentext kopieren',
+    'cp.msg_storage_full': 'Speichern fehlgeschlagen. Der Speicher ist möglicherweise voll — bitte eine Sicherung erstellen.',
+    'cp.msg_save_error': 'Fehler beim Speichern: {error}',
+    'cp.reminders_btn': '🔔 S-302/Briefe',
+    'cp.reminders_btn_count': '🔔 S-302/Briefe ({count})',
+    'cp.dist_km': '~{km} km',
+    'cp.dist_none': 'keine Koordinaten',
+    'cp.tours_grouped': '{count} weiter entfernte Fahrt(en) zusammengefasst.',
+    'cp.uncoded_note': '⚠️ {count} Versammlung(en) ohne Koordinaten wurden als „in der Nähe“ behandelt. Adresse ergänzen und im Versammlungseditor 📍 drücken, damit genauer gruppiert werden kann.',
+    'cp.select_text_first': 'Zuerst Text im Editor markieren',
+    'cp.letter_pages_empty': 'Keine zusätzlichen Seiten — nur der Brief auf Seite 1.',
+    'cp.letter_page_title_ph': 'Seitenüberschrift (optional)',
+    'cp.letter_page_delete_confirm': 'Diese Briefseite löschen?',
+    'cp.geo_saved': '📍 Koordinaten gespeichert',
+    'cp.geo_distance': '📍 ~{km} km vom Wohnort',
+    'cp.geo_saved_hint': '📍 Koordinaten gespeichert (unter Einstellungen den Wohnort angeben, um die Entfernung zu sehen)',
+    'cp.geo_need_address': 'Zuerst die Adresse der Versammlung eingeben',
+    'cp.geo_locating': 'Koordinaten werden ermittelt …',
+    'cp.geo_failed': '⚠️ Für diese Adresse konnten keine Koordinaten ermittelt werden',
+    'cp.geo_need_city': 'Zuerst den Wohnort eingeben',
+    'cp.geo_found': '📍 Gefunden: {place}',
+    'cp.geo_home_saved': 'Wohnort gespeichert',
+    'cp.geo_home_saved_coords': '📍 Koordinaten gespeichert ({lat}, {lng})',
+    'cp.vf_only_visits': 'Das Besuchsformular ist nur für Besuchseinträge verfügbar.',
+    'cp.vf_language_note': '🌐 Das Formular wird in folgender Sprache erstellt: <strong>{lang}</strong> (Dokumentsprache — unabhängig von der Sprache der Benutzeroberfläche).',
+    'cp.vf_time_ph': 'hh:mm',
+    'cp.vf_partner_ph': 'Name / Telefon',
+    'cp.vf_partner_label': 'Mit wem (Name / Telefon)',
+    'cp.vf_time': 'Uhrzeit',
+    'cp.vf_place': 'Ort',
+    'cp.vf_host': 'Gastgeber',
+    'cp.vf_phone': 'Telefon',
+    'cp.vf_note': 'Notiz',
+    'cp.vf_delete_row': 'Löschen',
+    'cp.pdf_not_loaded': 'Das PDF-Modul ist noch nicht geladen. Bitte in einer Sekunde noch einmal versuchen.',
+    'cp.letter_only_visits': 'Briefe sind nur für Besuchseinträge verfügbar.',
+    'cp.visit_congregation': 'Versammlung',
+    'cp.visit_group': 'Gruppe',
+    'cp.visit_pregroup': 'Vorgruppe',
+    'cp.attach_letter_and_plan': '📎 Der Brief ({pages} Seiten) und der Besuchsplan werden als PDF-Anhänge gesendet.',
+    'cp.attach_letter_only': '📎 Der Brief wird als PDF-Anhang gesendet ({pages} Seiten). Der Besuchsplan ist noch nicht ausgefüllt; falls er benötigt wird, zuerst das Besuchsformular öffnen.',
+    'cp.s302_form_missing': 'Das Formular S-302 wurde nicht gefunden (Formulardatei nicht geladen).',
+    'cp.s302_lib_missing': 'Die Bibliothek zum Ausfüllen von PDF-Dateien konnte nicht geladen werden. Internetverbindung prüfen.',
+    'cp.s302_font_failed': 'S-302: Aptos-Schriftart konnte nicht eingebettet werden; kyrillische Zeichen werden möglicherweise nicht angezeigt',
+    'cp.s302_field_missing': 'S-302: Feld nicht gefunden —',
+    'cp.s302_readonly_failed': 'S-302: Felder konnten nicht schreibgeschützt werden',
+    'cp.s302_fill_failed': 'Das Formular S-302 konnte nicht ausgefüllt werden.',
+    'cp.s302_generating': 'S-302 wird erstellt …',
+    'cp.s302_done': 'S-302 wurde erstellt und als gesendet markiert.',
+    'cp.sent_label': 'Gesendet',
+    'cp.files_downloaded': 'Dateien heruntergeladen — bitte manuell an die E-Mail anhängen.',
+    'cp.file_downloaded': 'Datei heruntergeladen — bitte manuell an die E-Mail anhängen.',
+    'cp.history_empty': 'Noch keine Kontrollpunkte. Sie entstehen automatisch während der Nutzung (höchstens einmal alle 5 Minuten).',
+    'cp.history_summary': '{events} Versammlungen, {entries} Besuche',
+    'cp.history_restore_confirm': 'Daten auf diesen Zeitpunkt zurücksetzen? Der aktuelle Stand wird ebenfalls als Kontrollpunkt gespeichert, sodass auch diese Wiederherstellung rückgängig gemacht werden kann.',
+    'cp.history_restored': 'Daten wiederhergestellt.',
+    'cp.history_restore_failed': 'Dieser Kontrollpunkt konnte nicht wiederhergestellt werden.',
+    'cp.reminder_60days': '⏰ Der Besuch „{title}“ ist in ≤60 Tagen — Zeit, den Brief zu senden.',
+    'cp.reminder_60days_many': '⏰ {count} Besuch(e) liegen bereits innerhalb von 60 Tagen, ohne dass der Brief gesendet wurde — siehe „🔔 S-302/Briefe“.',
+    'cp.new_day': 'Neuer Tag',
+    'cp.pdf_done': 'PDF erstellt',
+    'cp.letter_reset_confirm': 'Aktuellen Brieftext durch die Standardvorlage ersetzen? Der aktuelle Text geht verloren.',
+    'cp.letter_reset_done': 'Der Text wurde durch die aktuelle Standardvorlage ersetzt.',
+    'cp.vf_fill_first': 'Zuerst das Besuchsformular für diesen Eintrag ausfüllen.',
+    'cp.plan_downloaded': '📎 Der Plan wurde separat heruntergeladen. „Senden“ fügt Brief und Plan gemeinsam an, sofern die Plattform das unterstützt.',
+    'cp.email_default_restored': 'Standardtext wiederhergestellt',
+    'cp.salutation_restored': 'Standardanrede wiederhergestellt',
+    'cp.template_restored': 'Vorlage wiederhergestellt',
+
+    'cp.appTitle': 'Klindarium',
+    'cp.nav_calendar': 'Kalender',
+    'cp.nav_weeks': 'Wochen',
+    'cp.nav_events': 'Versammlungen',
+    'cp.nav_notes': 'Notizen',
+    'cp.nav_settings': 'Einstellungen',
+    'cp.screen_calendar': 'Kalender',
+    'cp.screen_weeks': 'Wochen',
+    'cp.screen_events': 'Versammlungen',
+    'cp.screen_notes': 'Notizen',
+    'cp.screen_settings': 'Einstellungen',
+    'cp.subtitle_calendar': 'Monatsübersicht und Besuche im Dienstjahr.',
+    'cp.subtitle_weeks': 'Wochenplanung, Notizen und Prioritäten.',
+    'cp.subtitle_events': 'Versammlungen, Adressen der Königreichssäle und Zeitpläne.',
+    'cp.subtitle_notes': 'Alle Wochennotizen durchsuchen und ansehen.',
+    'cp.subtitle_settings': 'Darstellung, Sprache, Export, Import und Verwaltung der Dienstjahre.',
+    'cp.version': 'Version',
+    'cp.theme': 'Design',
+    'cp.export': 'Export',
+    'cp.import_json': 'JSON importieren',
+    'cp.hide_team_panel': 'Teamleiste ausblenden',
+    'cp.show_team_panel': 'Teamleiste anzeigen',
+    'cp.today': 'Heute',
+    'cp.all_events': 'Alle Versammlungen',
+    'cp.service_year': 'Dienstjahr',
+    'cp.context': 'Kontext',
+    'cp.event': 'Versammlung',
+    'cp.weekend': 'Wochenende',
+    'cp.today_label': 'Heute',
+    'cp.no_events_month': 'Im ausgewählten Monat gibt es keine Ereignisse.',
+    'cp.no_note': 'Keine Notiz',
+    'cp.no_schedule': 'Kein Zeitplan',
+    'cp.no_address': 'Keine Adresse angegeben',
+    'cp.no_template': 'Keine Versammlung ausgewählt',
+    'cp.quick_status': 'Kurzstatus',
+    'cp.years_count': 'Dienstjahre',
+    'cp.templates_count': 'Versammlungen',
+    'cp.entries_count': 'Kalendereinträge',
+    'cp.notes_count': 'Notizen',
+    'cp.weeks_search': 'Nach Woche, Notiz oder Versammlung suchen',
+    'cp.notes_search': 'Notizen durchsuchen',
+    'cp.week_details': 'Wochendetails',
+    'cp.choose_week': 'Links eine Woche auswählen, um sie zu bearbeiten.',
+    'cp.assigned_event': 'Zugeordnete Versammlung',
+    'cp.priority': 'Priorität',
+    'cp.priority_normal': 'Normal',
+    'cp.priority_important': 'Wichtig',
+    'cp.priority_critical': 'Kritisch',
+    'cp.letter': 'Brief',
+    'cp.s302': 'S-302',
+    'cp.week_note': 'Wochennotiz',
+    'cp.save': 'Speichern',
+    'cp.delete': 'Löschen',
+    'cp.delete_week': 'Woche löschen',
+    'cp.clear_week_confirm': 'Daten der ausgewählten Woche löschen?',
+    'cp.event_templates': '',
+    'cp.events_search': 'Nach Name, Adresse oder Zeitplan suchen',
+    'cp.event_group_filter': 'Gruppe / Farbe',
+    'cp.all_event_groups': 'Alle Gruppen / Farben',
+    'cp.delete_all_events': 'Alle Versammlungen löschen',
+    'cp.delete_all_events_confirm': 'Alle Versammlungen und die zugehörigen Kalendereinträge löschen? Das kann nicht rückgängig gemacht werden.',
+    'cp.delete_all_events_done': 'Alle Versammlungen wurden gelöscht.',
+    'cp.events_shown_count': 'Angezeigt: {shown} von {total}',
+    'cp.event_editor': 'Versammlung bearbeiten',
+    'cp.name': 'Name',
+    'cp.color': 'Farbe',
+    'cp.address': 'Adresse',
+    'cp.schedule': 'Zeitplan',
+    'cp.clear': 'Leeren',
+    'cp.save_event': 'Versammlung speichern',
+    'cp.look_and_feel': 'Darstellung',
+    'cp.language': 'Sprache',
+    'cp.layout': 'Kalenderlayout',
+    'cp.theme_light': 'Hell',
+    'cp.theme_dark': 'Dunkel',
+    'cp.layout_help': 'Es stehen 5 Kalenderdarstellungen zur Verfügung.',
+    'cp.data_management': 'Datenverwaltung',
+    'cp.pdf_print': 'PDF / Drucken',
+    'cp.add_service_year': 'Dienstjahr hinzufügen',
+    'cp.add_next_year': 'Nächstes Jahr hinzufügen',
+    'cp.add': 'Hinzufügen',
+    'cp.create_backup': 'Sicherung erstellen',
+    'cp.reset_app': 'App zurücksetzen',
+    'cp.print_hint': 'Für PDF wird die Druckfunktion des Browsers verwendet.',
+    'cp.export_pdf_title': 'Als PDF exportieren',
+    'cp.export_pdf_sub': 'Format auswählen und die Druckfunktion des Browsers verwenden.',
+    'cp.month_grid': 'Monatskalender',
+    'cp.period_calendar': 'Kalender für einen Zeitraum',
+    'cp.month_grid_desc': 'Druckbares Raster für den aktuellen Monat.',
+    'cp.period_calendar_desc': 'Druck für den ausgewählten Zeitraum.',
+    'cp.reports': 'Listen und Berichte',
+    'cp.month_list': 'Versammlungen im Monat',
+    'cp.half_year': 'Ereignisse für 6 Monate',
+    'cp.year_events': 'Versammlungen im Jahr',
+    'cp.list_period': 'Liste für einen Zeitraum',
+    'cp.year_overview': 'Jahresübersicht',
+    'cp.notes_report': 'Notizbericht',
+    'cp.choose_range': 'Start- und Enddatum auswählen.',
+    'cp.close': 'Schließen',
+    'cp.print': 'Drucken',
+    'cp.export_title': 'Export',
+    'cp.export_sub': 'Exportformat auswählen: JSON-Sicherung oder Kalender (.ics) für Google/Apple.',
+    'cp.json_backup': 'JSON-Sicherung',
+    'cp.json_backup_desc': 'Vollständige Sicherung der App-Daten.',
+    'cp.ics_calendar': 'Kalender (.ics)',
+    'cp.ics_desc': 'Import in Google Kalender und Apple Kalender.',
+    'cp.range_start': 'Beginn',
+    'cp.range_end': 'Ende',
+    'cp.download': 'Herunterladen',
+    'cp.google_hint': 'Tipp: In Google Kalender „Einstellungen → Importieren & Exportieren → Importieren“ öffnen und die .ics-Datei auswählen. In Apple Kalender die Datei einfach öffnen.',
+    'cp.sync_title': 'Manuelle Synchronisierung',
+    'cp.sync_export': 'Synchronisierungsdatei herunterladen',
+    'cp.sync_import': 'Synchronisierungsdatei laden',
+    'cp.sync_export_done': 'Synchronisierungsdatei erstellt. In Google Drive ablegen.',
+    'cp.sync_import_confirm': 'Aktuelle Daten durch die Daten aus der Synchronisierungsdatei ersetzen?',
+    'cp.sync_import_done': 'Synchronisierungsdaten geladen.',
+    'cp.sync_import_failed': 'Synchronisierungsdatei konnte nicht geladen werden.',
+    'cp.sync_no_file': 'Eine JSON-Synchronisierungsdatei auswählen.',
+    'cp.sync_last_export': 'Letzter Export',
+    'cp.sync_last_import': 'Letzter Import',
+    'cp.sync_never': 'Noch keine Synchronisierung durchgeführt.',
+    'cp.team_panel': 'Teamleiste',
+    'cp.filter_event': 'Ereignisfilter',
+    'cp.event_details': 'Details',
+    'cp.no_events_found': 'Keine Treffer.',
+    'cp.no_notes': 'Keine Notizen.',
+    'cp.open': 'Öffnen',
+    'cp.new_event': 'Neue Versammlung',
+    'cp.edit_event': 'Versammlung bearbeiten',
+    'cp.choose_template': 'Versammlung auswählen',
+    'cp.start': 'Beginn',
+    'cp.end': 'Ende',
+    'cp.delete_event': 'Versammlung löschen',
+    'cp.create_entry_help': 'Es wird ein separater Kalendereintrag erstellt.',
+    'cp.edit_entry_help': 'Versammlung, Daten oder Notiz ändern oder das Ereignis löschen.',
+    'cp.note': 'Notiz',
+    'cp.google_maps': 'Google Maps',
+    'cp.google_calendar': 'Google Kalender',
+    'cp.apple_calendar': 'Apple / .ics',
+    'cp.edit': 'Bearbeiten',
+    'cp.type': 'Typ',
+    'cp.type_week': 'Woche',
+    'cp.type_entry': 'Eintrag',
+    'cp.template': 'Versammlung',
+    'cp.imported_backup': 'Alte Sicherung importiert und von Duplikaten bereinigt.',
+    'cp.imported_json': 'JSON erfolgreich importiert.',
+    'cp.import_failed': 'JSON konnte nicht importiert werden.',
+    'cp.week_saved': 'Woche gespeichert.',
+    'cp.event_template_saved': 'Versammlung gespeichert.',
+    'cp.calendar_event_saved': 'Kalendereintrag gespeichert.',
+    'cp.calendar_event_deleted': 'Ereignis gelöscht.',
+    'cp.week_deleted': 'Wochendaten gelöscht.',
+    'cp.reset_confirm': 'App-Daten zurücksetzen?',
+    'cp.app_reset': 'App wurde zurückgesetzt.',
+    'cp.invalid_year': 'Ein gültiges Jahr eingeben, z. B. 2029.',
+    'cp.added_year': 'Dienstjahr {year} hinzugefügt',
+    'cp.choose_template_dates': 'Versammlung und Daten auswählen.',
+    'cp.wrong_end_date': 'Das Enddatum darf nicht vor dem Startdatum liegen.',
+    'cp.enter_event_name': 'Namen der Versammlung eingeben.',
+    'cp.offline': 'Du bist offline. Änderungen werden lokal gespeichert.',
+    'cp.import_google_single': 'Ereignis in Google/Apple Kalender importieren',
+    'cp.add_on_date': 'Versammlung hinzufügen',
+    'cp.placeholder_schedule': 'Mi 19:00, Sa 10:00',
+    'cp.delete_note': 'Notiz löschen',
+    'cp.delete_template': 'Versammlung löschen',
+    'cp.delete_note_confirm': 'Diese Notiz löschen?',
+    'cp.delete_template_confirm': 'Versammlung löschen',
+    'cp.calendar_view_month': 'Ansicht: Monat',
+    'cp.calendar_view_year': 'Ansicht: Dienstjahr',
+    'cp.day_details_title': 'Tag und Woche',
+    'cp.week_planned': 'Plan für die Woche',
+    'cp.entries_on_day': 'Versammlungen an diesem Tag',
+    'cp.no_entries_day': 'Keine Versammlungen an diesem Tag.',
+    'cp.open_week': 'Woche öffnen',
+    'cp.add_entry': 'Versammlung hinzufügen',
+    'cp.edit_week_event': 'Wochenplan bearbeiten',
+    'cp.compact_year_hint': 'Auf kleinen Bildschirmen ist die kompakte Ansicht aktiv: Einen Tag antippen, um Details zur Woche und zu Ereignissen zu sehen.',
+    'cp.sent_status': 'Versandstatus',
+    'cp.letter_short': 'Brief',
+    'cp.s302_short': 'S-302',
+    'cp.send_control': 'Versandstatus',
+    'cp.needs_sending': 'Noch zu senden',
+    'cp.sent_done': 'Gesendet',
+    'cp.deadline': 'Frist',
+    'cp.before_visit_hint': 'Empfohlene Frist: vor Beginn der Besuchswoche.',
+    'cp.reminders_title': 'Was noch gesendet werden muss',
+    'cp.reminders_subtitle': 'Bevorstehende Besuche, bei denen S-302 oder ein Brief noch fehlt',
+    'cp.reminders_none': 'Bei allen Besuchen ist alles erledigt — nichts Dringendes.',
+    'cp.reminders_s302_needed': 'S-302 senden',
+    'cp.reminders_letter_needed': 'Brief senden',
+    'cp.reminders_mark_s302': 'S-302 gesendet',
+    'cp.reminders_mark_letter': 'Brief gesendet',
+    'cp.reminders_overdue': 'Überfällig',
+    'cp.reminders_days_left': 'noch {days} Tage',
+    'cp.reminders_close': 'Schließen',
+    'cp.reminders_open_entry': 'Eintrag öffnen',
+    'cp.visit_type': 'Besuchsart',
+    'cp.visit_type_none': 'Kein Besuch',
+    'cp.visit_type_congregation': 'Versammlung',
+    'cp.visit_type_group': 'Gruppe',
+    'cp.visit_type_pregroup': 'Vorgruppe',
+    'cp.contact_info': 'Kontaktperson',
+    'cp.contact_name': 'Name',
+    'cp.contact_phone': 'Telefon',
+    'cp.contact_email': 'E-Mail',
+    'cp.contact_note': 'Notiz',
+    'cp.countdown_today': 'Heute',
+    'cp.countdown_future': 'In {value} {label}',
+    'cp.countdown_past': 'vor {value} {label}',
+    'cp.copied': 'Kopiert',
+    'cp.copy': 'Kopieren',
+    'cp.stats_title': 'Statistik des Dienstjahres',
+    'cp.stats_planned': 'Geplante Besuche',
+    'cp.stats_done': 'Abgeschlossen',
+    'cp.unvisited_title': 'Kein Besuch geplant',
+    'cp.unvisited_none': 'Für alle Versammlungen ist ein Besuch geplant ✓',
+    'cp.planner_nothing': 'Mindestens eine Versammlung auswählen',
+    'cp.planner_no_free_weeks': 'Im ausgewählten Zeitraum gibt es keine freien Wochen',
+    'cp.planner_confirm': 'Besuche nach Plan erstellen',
+    'cp.planner_created': 'Besuche erstellt',
+    'cp.conflict_warning': '⚠️ Für diese Daten ist bereits ein anderer Besuch geplant:',
+    'cp.conflict_proceed': 'Trotzdem speichern?',
+    'cp.next_visit': 'Nächster Besuch',
+    'cp.next_visit_none': 'Keine bevorstehenden Besuche',
+    'cp.compose_letter': 'Brief erstellen',
+    'cp.share': 'Teilen',
+    'cp.letter_body_greeting': 'Liebe Brüder!',
+    'cp.letter_body_visit': 'Ein Besuch ist geplant',
+    'cp.letter_body_closing': 'Mit brüderlicher Liebe.',
+    'cp.result_note': 'Ergebnis des Besuchs (nach dem Besuch)',
+    'cp.result_note_short': 'Ergebnis des Besuchs',
+    'cp.last_visit_result': 'Vorheriger Besuch',
+    'cp.backup_prompt': 'Jetzt eine Sicherung herunterladen?',
+    'cp.backup_never': 'Es wurde noch keine Sicherung erstellt.',
+    'cp.backup_overdue': 'Die letzte Sicherung war vor {days} Tagen.',
+    'cp.pin_on': 'PIN: an',
+    'cp.pin_off': 'PIN: aus',
+    'cp.pin_set_prompt': 'PIN festlegen (4–8 Ziffern):',
+    'cp.pin_format': 'Die PIN muss aus 4–8 Ziffern bestehen',
+    'cp.pin_enabled': 'PIN aktiviert',
+    'cp.pin_disabled': 'PIN deaktiviert',
+    'cp.pin_wrong': 'Falsche PIN',
+    'cp.pin_enter_current': 'Aktuelle PIN eingeben:',
+    'cp.pin_disable_confirm': 'PIN deaktivieren?',
+    'cp.visits_schedule': 'Besuchsplan (für den Kreisaufseher)',
+  };
+
+
+
+  // ---------- Schritt 25: i18n-Audit der sichtbaren Oberfläche ----------
+  // Здесь только общие UI-слова. JW-термины продолжают приходить из основного
+  // словаря/немецкого слоя, уже сверенного по jw.org.
+  const AUDIT_I18N = {
+    ru: {
+      'cp.audit.more_actions': '⋯ Ещё действия',
+      'cp.audit.generate_s302': '📋 Сформировать S-302',
+      'cp.audit.generate_send_s302': '📋 Сформировать и отправить S-302',
+      'cp.audit.day': 'День',
+    },
+    uk: {
+      'cp.audit.more_actions': '⋯ Інші дії',
+      'cp.audit.generate_s302': '📋 Сформувати S-302',
+      'cp.audit.generate_send_s302': '📋 Сформувати й надіслати S-302',
+      'cp.audit.day': 'День',
+    },
+    en: {
+      'cp.audit.more_actions': '⋯ More actions',
+      'cp.audit.generate_s302': '📋 Generate S-302',
+      'cp.audit.generate_send_s302': '📋 Generate and send S-302',
+      'cp.audit.day': 'Day',
+    },
+    pl: {
+      'cp.audit.more_actions': '⋯ Więcej działań',
+      'cp.audit.generate_s302': '📋 Utwórz S-302',
+      'cp.audit.generate_send_s302': '📋 Utwórz i wyślij S-302',
+      'cp.audit.day': 'Dzień',
+    },
+    de: {
+      'cp.audit.more_actions': '⋯ Weitere Aktionen',
+      'cp.audit.generate_s302': '📋 S-302 erstellen',
+      'cp.audit.generate_send_s302': '📋 S-302 erstellen und senden',
+      'cp.audit.day': 'Tag',
+    },
+  };
+
+  if (typeof CWI18n !== 'undefined') CWI18n.register(AUDIT_I18N);
+
+  function installVisibleI18nAudit(app) {
+    const textKeyByOriginal = new Map([
+      ['⋯ Ещё действия', 'audit.more_actions'],
+      ['Ещё действия', 'audit.more_actions'],
+      ['📋 Формуляр визита', 'visit_form_btn'],
+      ['Формуляр визита', 'visit_form_btn'],
+      ['📋 Сформировать S-302', 'audit.generate_s302'],
+      ['Сформировать S-302', 'audit.generate_s302'],
+      ['📋 Сформировать и отправить S-302', 'audit.generate_send_s302'],
+      ['Сформировать и отправить S-302', 'audit.generate_send_s302'],
+      ['Тип', 'type'],
+      ['День', 'audit.day'],
+    ]);
+
+    const trackedText = new Map();
+    const trackedAttrs = new Map();
+    const nativeLanguageSelects = new Set(['languageSelect','vfLanguageSelect','eventFormLanguageSelect']);
+
+    const translate = (key) => app.utils.t(key);
+
+    const skipTextNode = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return true;
+      if (['SCRIPT','STYLE','TEXTAREA'].includes(parent.tagName)) return true;
+      if (parent.closest('[contenteditable="true"]')) return true;
+      if (parent.tagName === 'OPTION' && nativeLanguageSelects.has(parent.parentElement?.id)) return true;
+      return false;
+    };
+
+    const applyTextNode = (node, key) => {
+      if (!node?.isConnected || skipTextNode(node)) return;
+      const raw = node.nodeValue || '';
+      const match = raw.match(/^(\s*)(.*?)(\s*)$/s);
+      const lead = match?.[1] || '';
+      const trail = match?.[3] || '';
+      node.nodeValue = lead + translate(key) + trail;
+    };
+
+    const inspectTextNode = (node) => {
+      if (skipTextNode(node)) return;
+      if (trackedText.has(node)) {
+        applyTextNode(node, trackedText.get(node));
+        return;
+      }
+      const trimmed = (node.nodeValue || '').trim();
+      const key = textKeyByOriginal.get(trimmed);
+      if (!key) return;
+      trackedText.set(node, key);
+      applyTextNode(node, key);
+    };
+
+    const inspectElementAttrs = (el) => {
+      if (!(el instanceof Element)) return;
+      ['title','aria-label','placeholder'].forEach((attr) => {
+        const value = (el.getAttribute(attr) || '').trim();
+        const key = textKeyByOriginal.get(value);
+        if (!key) return;
+        const token = `${attr}:${key}`;
+        trackedAttrs.set(el, trackedAttrs.get(el) || new Set());
+        trackedAttrs.get(el).add(token);
+        el.setAttribute(attr, translate(key).replace(/^[📋⋯]\s*/, ''));
+      });
+    };
+
+    const scan = (root = document.body) => {
+      if (!root) return;
+      if (root.nodeType === Node.TEXT_NODE) inspectTextNode(root);
+      if (root.nodeType === Node.ELEMENT_NODE) inspectElementAttrs(root);
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+      let node;
+      while ((node = walker.nextNode())) {
+        if (node.nodeType === Node.TEXT_NODE) inspectTextNode(node);
+        else inspectElementAttrs(node);
+      }
+    };
+
+    const reapply = () => {
+      for (const [node, key] of Array.from(trackedText.entries())) {
+        if (!node.isConnected) {
+          trackedText.delete(node);
+          continue;
+        }
+        applyTextNode(node, key);
+      }
+      for (const [el, tokens] of Array.from(trackedAttrs.entries())) {
+        if (!el.isConnected) {
+          trackedAttrs.delete(el);
+          continue;
+        }
+        for (const token of tokens) {
+          const split = token.indexOf(':');
+          const attr = token.slice(0, split);
+          const key = token.slice(split + 1);
+          el.setAttribute(attr, translate(key).replace(/^[📋⋯]\s*/, ''));
+        }
+      }
+      scan(document.body);
+    };
+
+    const report = () => {
+      const lang = app.utils.lang();
+      if (!['en','pl','de'].includes(lang)) return [];
+      const leaks = [];
+      const selectors = 'button,summary,label,h1,h2,h3,h4,.small,.hint,.side-label,.modal-sub';
+      document.querySelectorAll(selectors).forEach((el) => {
+        if (el.closest('textarea,[contenteditable="true"]')) return;
+        const value = (el.textContent || '').trim();
+        if (!value || !/[\u0400-\u04FF]/.test(value)) return;
+        leaks.push(value.slice(0, 140));
+      });
+      const unique = [...new Set(leaks)].slice(0, 30);
+      if (unique.length) console.warn('Klindariy i18n audit: возможные непереведённые UI-строки', unique);
+      return unique;
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (m.type === 'characterData') inspectTextNode(m.target);
+        m.addedNodes.forEach((node) => scan(node));
+      });
+    });
+
+    setTimeout(() => {
+      scan(document.body);
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+      if (typeof CWI18n !== 'undefined' && CWI18n.onChange) {
+        CWI18n.onChange(() => setTimeout(() => {
+          reapply();
+          report();
+        }, 0));
+      }
+      setTimeout(report, 50);
+    }, 0);
+
+    window.CWI18nAudit = { scan: () => scan(document.body), report, reapply };
+  }
+
+  // ---------- Schritt 24: deutsche Dokumentsprache ----------
+  // JW-spezifische Begriffe in diesem Block wurden ausschließlich anhand
+  // der deutschsprachigen Inhalte auf jw.org gewählt.
+  const DE_VP_DICT = {
+    visitTypeMeeting: 'Versammlung',
+    visitTypeGroup: 'Gruppe',
+    visitTypePregroup: 'Vorgruppe',
+
+    meetingTypeMidweek: 'Leben-und-Dienst-Zusammenkunft',
+    meetingTypeWeekend: 'Zusammenkunft am Wochenende',
+    meetingTypeElders: 'Ältestensitzung',
+    meetingTypeWithElders: 'Zusammenkunft mit den Ältesten',
+    meetingTypePioneers: 'Zusammenkunft mit Pionieren',
+    meetingTypeOther: 'Andere',
+
+    meetingTypeLabel: 'Art der Zusammenkunft',
+    dayLabel: 'Wochentag',
+    timeLabel: 'Uhrzeit',
+    placeLabel: 'Ort',
+
+    weekdayMon: 'Montag',
+    weekdayTue: 'Dienstag',
+    weekdayWed: 'Mittwoch',
+    weekdayThu: 'Donnerstag',
+    weekdayFri: 'Freitag',
+    weekdaySat: 'Samstag',
+    weekdaySun: 'Sonntag',
+
+    serviceTableTime: 'Uhrzeit',
+    serviceTablePlace: 'Treffpunkt',
+    serviceTablePartner: 'Mit wem (Name/Telefon)',
+    serviceTableKind: 'Art des Predigtdienstes',
+
+    pastoralName: 'Name',
+    pastoralDay: 'Tag',
+    pastoralTime: 'Uhrzeit',
+    pastoralReason: 'Grund für den Hirtenbesuch',
+
+    mealDay: 'Tag',
+    mealTime: 'Uhrzeit',
+    mealPlace: 'Ort',
+    mealHost: 'Gastgeber',
+    mealPhone: 'Telefon',
+    mealNote: 'Notiz',
+
+    pdfPageForAlex: 'Formular für Alex',
+    pdfPageForLydia: 'Formular für Lidia',
+    pdfVisitTypeLabel: 'Besuchsart:',
+    pdfMeetingsSchedule: 'Zusammenkünfte',
+    pdfServicePlan: 'Plan für den Predigtdienst',
+    pdfPastoralVisits: 'Hirtenbesuche',
+    pdfMeals: 'Mahlzeiten',
+    pdfNotes: 'Zusätzliche Notizen',
+    pdfManualLinesTitle: 'Für handschriftliche Notizen',
+    pdfGeneratedOn: 'Dokument erstellt am',
+  };
+
+  const DE_VPI = {
+    lang: 'de',
+    WEEKDAYS: ['weekdayMon','weekdayTue','weekdayWed','weekdayThu','weekdayFri','weekdaySat','weekdaySun'],
+    MEETING_TYPES: ['meetingTypeMidweek','meetingTypeWeekend','meetingTypeElders','meetingTypeWithElders','meetingTypePioneers','meetingTypeOther'],
+    MEAL_DAY_KEYS: ['weekdayWed','weekdayThu','weekdayFri','weekdaySat','weekdaySun'],
+    dict: DE_VP_DICT,
+    t(key) { return this.dict[key] || key; },
+  };
+
+  const DE_LETTER_BODY = `
+<p>Die Zeit vergeht schnell! Meine Frau und ich freuen uns sehr, dass die Zeit gekommen ist, eure Versammlung zu besuchen. Es ist für uns wieder eine große Freude, die Woche des Besuchs mit euch zu verbringen.</p>
+
+<p>Der Besuch findet vom {start_date} bis {end_date} statt.</p>
+
+<p>Diese Woche gibt uns die Gelegenheit, einander zu dienen und uns von Jehova stärken zu lassen (Jesaja 41:10).</p>
+
+<p>Die Versammlung wird sich bestimmt freuen, davon zu hören. Ihr könnt die Brüder und Schwestern schon jetzt ermuntern, die Woche des Besuchs möglichst gut zu unterstützen. Ihr könnt die Verkündiger auch an die Möglichkeit erinnern, im Besuchsmonat als Hilfspioniere mit einem Ziel von 15 oder 30 Stunden zu dienen. Alle, die in diesem Monat in irgendeiner Form im Pionierdienst stehen, laden wir herzlich zur Zusammenkunft mit Pionieren ein. Liebe Älteste, eure Unterstützung in dieser Woche wird uns allen helfen, möglichst viel Ermunterung und Nutzen daraus zu ziehen.</p>
+
+<p>Für uns ist es immer eine besondere Freude, mit euch im Predigtdienst zusammenzuarbeiten, zum Beispiel beim Predigen an öffentlichen Orten. Wir begleiten Verkündiger auch gern bei Rückbesuchen und Bibelstudien, zu denen sie uns einladen. Vielleicht gibt es in der Versammlung Kinder oder Jugendliche, mit denen die Bibel studiert wird — auch zu solchen Bibelstudien kommen wir gern mit. Wer mit uns in den Predigtdienst gehen möchte, aber gerade keinen Rückbesuch oder kein Bibelstudium hat, kann sich ebenfalls gern mit uns verabreden.</p>`;
+
+  const DE_EMAIL_BODY_TEMPLATES = {
+    Congregation: `Liebe Brüder,
+
+im Anhang sende ich euch den Brief vor dem Besuch der Versammlung {congregation} vom {start_date} bis {end_date}.
+
+Mit brüderlichen Grüßen
+{sender}`,
+    Group: `Liebe Brüder,
+
+im Anhang sende ich euch den Brief vor dem Besuch der Gruppe {congregation} vom {start_date} bis {end_date}.
+
+Mit brüderlichen Grüßen
+{sender}`,
+    Pregroup: `Liebe Brüder,
+
+im Anhang sende ich euch den Brief vor dem Besuch der Vorgruppe {congregation} vom {start_date} bis {end_date}.
+
+Mit brüderlichen Grüßen
+{sender}`,
+  };
+
+  const DE_SALUTATIONS = {
+    Congregation: 'An die Ältestenschaft der Versammlung {congregation}{cong_number_suffix}',
+    Group: 'An den verantwortlichen Bruder der Gruppe {congregation}',
+    Pregroup: 'An den verantwortlichen Bruder der Vorgruppe {congregation}',
+  };
+
+  const DE_DEFAULT_MEMO = {
+    title: 'HINWEISE FÜR DEN KOORDINATOR DER ÄLTESTENSCHAFT',
+    html: `<div>• Bitte das aktuelle Formular S-61 beachten und die benötigten Angaben rechtzeitig vorbereiten.</div>
+<div>• Die Zusammenkunft mit den ernannten Brüdern bitte für Freitagabend einplanen.</div>
+<div>• Bitte 2–3 Hirtenbesuche einplanen. Wenn möglich, nicht unmittelbar nach einer Zusammenkunft für den Predigtdienst. Donnerstagvormittag bitte freihalten.</div>
+<div>• Ich besuche gern junge Verkündiger, Pioniere sowie ältere Brüder und Schwestern, die Ermunterung gebrauchen können.</div>
+<div>• Bitte genügend Möglichkeiten für den gemeinsamen Predigtdienst einplanen.</div>
+<div>• Änderungen oder besondere Bedürfnisse bitte möglichst früh mitteilen.</div>`
+  };
+
+  const DE_NATIVE_LANG_NAMES = {
+    ru: 'Русский',
+    uk: 'Українська',
+    en: 'English',
+    pl: 'Polski',
+    de: 'Deutsch',
+  };
+
+  function deFormatDate(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function deLetterSuffix(app, visitType) {
+    return app.ui.letterTypeSuffix ? app.ui.letterTypeSuffix(visitType) : (
+      visitType === 'group' ? 'Group' : visitType === 'pregroup' ? 'Pregroup' : 'Congregation'
+    );
+  }
+
+  function deSubstitute(app, template, entry, event) {
+    const congregation = event?.name || entry?.title || '';
+    const congNumber = event?.congNumber || '';
+    return String(template || '')
+      .replace(/\{congregation\}/g, congregation)
+      .replace(/\{cong_number\}/g, congNumber)
+      .replace(/\{cong_number_suffix\}/g, congNumber ? ` (${congNumber})` : '')
+      .replace(/\{start_date\}/g, deFormatDate(entry?.start))
+      .replace(/\{end_date\}/g, deFormatDate(entry?.end))
+      .replace(/\{today\}/g, deFormatDate(new Date()))
+      .replace(/\{sender\}/g, app.shared.sender().name || '')
+      .replace(/\{contact_name\}/g, event?.contactName || '');
+  }
+
+  function deVisitFormTranslateDom(root) {
+    if (!root) return;
+    const map = new Map([
+      ['Тип', 'Art'],
+      ['День', 'Tag'],
+      ['Время', 'Uhrzeit'],
+      ['Место', 'Ort'],
+      ['Место проведения', 'Ort'],
+      ['С кем (имя / телефон)', 'Mit wem (Name / Telefon)'],
+      ['С кем (имя/тел.)', 'Mit wem (Name/Telefon)'],
+      ['Вид служения', 'Art des Predigtdienstes'],
+      ['Имя', 'Name'],
+      ['Причина пастырского посещения', 'Grund für den Hirtenbesuch'],
+      ['Кто принимает', 'Gastgeber'],
+      ['Телефон', 'Telefon'],
+      ['Примечание', 'Notiz'],
+      ['Удалить', 'Löschen'],
+    ]);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const raw = node.nodeValue || '';
+      const trimmed = raw.trim();
+      if (!map.has(trimmed)) continue;
+      node.nodeValue = raw.replace(trimmed, map.get(trimmed));
+    }
+    root.querySelectorAll('option[value]').forEach((opt) => {
+      const key = opt.value;
+      if (DE_VP_DICT[key]) opt.textContent = DE_VP_DICT[key];
+    });
+  }
+
+  function dePlainParagraphs(html) {
+    const holder = document.createElement('div');
+    holder.innerHTML = String(html || '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|div|li|h[1-6])>/gi, '\n\n');
+    return (holder.textContent || '')
+      .split(/\n\s*\n/g)
+      .map((p) => p.trim())
+      .filter(Boolean);
+  }
+
+  function buildGermanLetterPdf(app, entry, event, draftOverride) {
+    if (!window.jspdf) {
+      app.utils.toast(app.utils.t('pdf_not_loaded'));
+      return null;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const FONT = 'Aptos';
+    const hasRegular = !!window.APTOS_REGULAR_B64;
+    const hasBold = !!window.APTOS_BOLD_B64;
+
+    if (hasRegular) {
+      doc.addFileToVFS('Aptos.ttf', window.APTOS_REGULAR_B64);
+      doc.addFont('Aptos.ttf', FONT, 'normal');
+    }
+    if (hasBold) {
+      doc.addFileToVFS('Aptos-Bold.ttf', window.APTOS_BOLD_B64);
+      doc.addFont('Aptos-Bold.ttf', FONT, 'bold');
+    }
+
+    const margin = 54;
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const bottom = pageH - 58;
+    const usable = pageW - margin * 2;
+    let y = margin;
+
+    const setFont = (bold = false, size = 11, color = [30, 34, 44]) => {
+      doc.setFont(hasRegular ? FONT : 'helvetica', bold && hasBold ? 'bold' : 'normal');
+      doc.setFontSize(size);
+      doc.setTextColor(...color);
+    };
+
+    const drawHeader = () => {
+      setFont(false, 9.5, [60, 64, 74]);
+      const s = app.shared.sender();
+      const lines = [s.name, s.address, s.phone1, s.email].filter(Boolean);
+      let hy = margin;
+      lines.forEach((line) => {
+        doc.text(String(line), pageW - margin, hy, { align: 'right' });
+        hy += 13;
+      });
+      setFont();
+      y = Math.max(y, hy + 18);
+    };
+
+    const ensure = (need = 30) => {
+      if (y + need <= bottom) return;
+      doc.addPage();
+      y = margin;
+      drawHeader();
+    };
+
+    const paragraph = (text, opts = {}) => {
+      const size = opts.size || 11;
+      const gap = opts.gap ?? 13;
+      const bold = !!opts.bold;
+      const align = opts.align || 'left';
+      setFont(bold, size, opts.color || [30, 34, 44]);
+      const lines = doc.splitTextToSize(String(text || ''), usable);
+      ensure(lines.length * (size + 3) + gap + 8);
+      if (align === 'center') {
+        lines.forEach((line) => {
+          doc.text(line, pageW / 2, y, { align: 'center' });
+          y += size + 3;
+        });
+      } else {
+        doc.text(lines, margin, y);
+        y += lines.length * (size + 3);
+      }
+      y += gap;
+    };
+
+    drawHeader();
+
+    const suffix = deLetterSuffix(app, event?.visitType);
+    paragraph(deSubstitute(app, DE_SALUTATIONS[suffix], entry, event), { bold: true, size: 11.5, gap: 4 });
+    setFont(false, 10.5);
+    doc.text(deFormatDate(new Date()), pageW - margin, y, { align: 'right' });
+    y += 24;
+
+    paragraph('Liebe Brüder!', { bold: true, gap: 10 });
+
+    const bodyHtml = draftOverride?.bodyHtml || DE_LETTER_BODY;
+    dePlainParagraphs(deSubstitute(app, bodyHtml, entry, event)).forEach((p) => paragraph(p, { gap: 11 }));
+
+    paragraph('Wir freuen uns schon sehr auf die gemeinsame Zeit und senden euch herzliche brüderliche Grüße.', { gap: 16 });
+    paragraph(`Euer ${app.shared.sender().name || ''}`, { bold: true, gap: 0 });
+
+    const configured = draftOverride?.pages ?? (app.state.app.settings.letterPages?.[suffix] || []);
+    const hasCyrillic = (value) => /[\u0400-\u04FF]/.test(String(value || ''));
+    let pages = configured;
+    if (Array.isArray(configured) && configured.some((p) => hasCyrillic(p?.title) || hasCyrillic(p?.html))) {
+      pages = [DE_DEFAULT_MEMO];
+    }
+
+    (pages || []).forEach((page) => {
+      doc.addPage();
+      y = margin;
+      drawHeader();
+      if (page?.title) paragraph(deSubstitute(app, page.title, entry, event), { bold: true, size: 12.5, align: 'center', gap: 18 });
+      dePlainParagraphs(deSubstitute(app, page?.html || '', entry, event)).forEach((p) => paragraph(p, { size: 10.2, gap: 9 }));
+    });
+
+    const total = doc.internal.getNumberOfPages();
+    for (let n = 1; n <= total; n += 1) {
+      doc.setPage(n);
+      setFont(false, 8.5, [100, 104, 112]);
+      doc.text(`Seite ${n} / ${total}`, pageW - margin, pageH - 28, { align: 'right' });
+    }
+    return doc;
+  }
+
+  if (typeof CWI18n !== 'undefined') {
+    CWI18n.register({ de: DE });
+  } else {
+    console.error('circuit-planner: CWI18n ist für den deutschen Wörterbuch-Layer nicht verfügbar');
+  }
+
+  // Der Sprachwähler steht bereits im DOM, weil dieses defer-Skript nach dem
+  // vollständigen Parsen der Seite und vor app.js ausgeführt wird.
+  const languageSelect = document.getElementById('languageSelect');
+  if (languageSelect && !languageSelect.querySelector('option[value="de"]')) {
+    const option = document.createElement('option');
+    option.value = 'de';
+    option.textContent = 'Deutsch';
+    languageSelect.appendChild(option);
+  }
+
+  // Deutsch также доступен как независимый язык ДОКУМЕНТА.
+  ['eventFormLanguageSelect', 'vfLanguageSelect'].forEach((id) => {
+    const select = document.getElementById(id);
+    if (!select || select.querySelector('option[value="de"]')) return;
+    const option = document.createElement('option');
+    option.value = 'de';
+    option.textContent = 'Deutsch';
+    select.appendChild(option);
+  });
+
+  // app.js baut `const App = {...}` lokal auf und veröffentlicht es unmittelbar
+  // vor App.init() als window.App. Ein Setter erlaubt uns, das Objekt genau dort
+  // zu erweitern, ohne den großen Monolithen nur wegen der Sprache zu duplizieren.
+  // Danach wird window.App sofort wieder zu einer normalen Property.
+  let publishedApp = null;
+  Object.defineProperty(window, 'App', {
+    configurable: true,
+    enumerable: true,
+    get() { return publishedApp; },
+    set(app) {
+      publishedApp = app;
+      try {
+        if (app && app.i18nBridge) {
+          if (!app.i18nBridge.SUPPORTED.includes('de')) app.i18nBridge.SUPPORTED.push('de');
+          if (app.i18nBridge.NEAREST) delete app.i18nBridge.NEAREST.de;
+        }
+
+        if (app && app.config) {
+          app.config.monthNames.de = [
+            'Januar','Februar','März','April','Mai','Juni',
+            'Juli','August','September','Oktober','November','Dezember'
+          ];
+          app.config.dayNames.de = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+        }
+
+        if (app && app.utils) {
+          const originalColorName = app.utils.colorName;
+          const germanColors = {
+            '#1f7a45':'Grün',
+            '#2563eb':'Blau',
+            '#1976d2':'Hellblau',
+            '#d32f2f':'Rot',
+            '#e53935':'Scharlachrot',
+            '#0097a7':'Türkis',
+            '#ef6c00':'Orange',
+            '#7b1fa2':'Violett',
+            '#5d4037':'Braun',
+            '#00897b':'Dunkeltürkis',
+            '#6d4c41':'Kaffeebraun',
+            '#546e7a':'Blaugrau',
+            '#3949ab':'Indigo',
+            '#8e24aa':'Purpur',
+            '#f4511e':'Dunkelorange',
+            '#43a047':'Hellgrün'
+          };
+          app.utils.colorName = function (color) {
+            if (this.lang() !== 'de') return originalColorName.call(this, color);
+            return germanColors[String(color || '').toLowerCase()] || this.t('color');
+          };
+
+          const originalPluralUnit = app.utils.pluralUnit;
+          app.utils.pluralUnit = function (value, kind) {
+            if (this.lang() !== 'de') return originalPluralUnit.call(this, value, kind);
+            const forms = {
+              day: ['Tag','Tage'],
+              week: ['Woche','Wochen'],
+              month: ['Monat','Monate'],
+              hour: ['Stunde','Stunden']
+            }[kind] || ['',''];
+            return Number(value) === 1 ? forms[0] : forms[1];
+          };
+
+          // Die Feiertagsnamen waren bisher direkt russisch in app.js hinterlegt.
+          // Für die deutsche Oberfläche liefern wir dieselben Termine mit deutschen
+          // Namen; die Berechnung selbst bleibt unverändert.
+          const originalHolidaysForYear = app.utils.holidaysForYear;
+          app.utils.holidaysForYear = function (year) {
+            if (this.lang() !== 'de') return originalHolidaysForYear.call(this, year);
+            const iso = (d) => this.iso(d);
+            const easter = this.easterDate(year);
+            const off = (days) => {
+              const d = new Date(easter);
+              d.setDate(d.getDate() + days);
+              return d;
+            };
+            const map = {};
+            const add = (dateIso, name) => {
+              (map[dateIso] = map[dateIso] || []).push(name);
+            };
+            add(`${year}-01-01`, 'Neujahr (CZ/AT/DE)');
+            add(`${year}-05-01`, 'Tag der Arbeit (CZ/AT/DE)');
+            add(`${year}-12-24`, 'Heiligabend (CZ/DE teilweise)');
+            add(`${year}-12-25`, '1. Weihnachtstag (CZ/AT/DE)');
+            add(`${year}-12-26`, '2. Weihnachtstag (CZ/AT/DE)');
+            add(`${year}-05-08`, 'Tag des Sieges (CZ)');
+            add(`${year}-07-05`, 'Kyrill und Method (CZ)');
+            add(`${year}-07-06`, 'Jan Hus (CZ)');
+            add(`${year}-09-28`, 'Tag der tschechischen Staatlichkeit (CZ)');
+            add(`${year}-10-28`, 'Tag der Staatsgründung (CZ)');
+            add(`${year}-11-17`, 'Tag des Kampfes für Freiheit und Demokratie (CZ)');
+            add(`${year}-01-06`, 'Heilige Drei Könige (AT)');
+            add(`${year}-08-15`, 'Mariä Himmelfahrt (AT)');
+            add(`${year}-10-26`, 'Nationalfeiertag (AT)');
+            add(`${year}-11-01`, 'Allerheiligen (AT)');
+            add(`${year}-12-08`, 'Mariä Empfängnis (AT)');
+            add(`${year}-10-03`, 'Tag der Deutschen Einheit (DE)');
+            add(iso(off(-2)), 'Karfreitag (CZ/DE)');
+            add(iso(off(1)), 'Ostermontag (CZ/AT/DE)');
+            add(iso(off(39)), 'Christi Himmelfahrt (AT/DE)');
+            add(iso(off(50)), 'Pfingstmontag (AT/DE)');
+            add(iso(off(60)), 'Fronleichnam (AT/DE teilweise)');
+            return map;
+          };
+        }
+
+        if (app && app.ui) {
+          const originalRetranslateVisitFormWeekdays = app.ui.retranslateVisitFormWeekdays?.bind(app.ui);
+          if (originalRetranslateVisitFormWeekdays) {
+            app.ui.retranslateVisitFormWeekdays = function (oldLang, newLang) {
+              const state = app.state.visitFormData;
+              if (!state) return;
+              const deDays = {
+                Понедельник: 'Montag', Вторник: 'Dienstag', Среда: 'Mittwoch',
+                Четверг: 'Donnerstag', Пятница: 'Freitag', Суббота: 'Samstag', Воскресенье: 'Sonntag'
+              };
+              const ruDays = {
+                Montag: 'Понедельник', Dienstag: 'Вторник', Mittwoch: 'Среда',
+                Donnerstag: 'Четверг', Freitag: 'Пятница', Samstag: 'Суббота', Sonntag: 'Воскресенье'
+              };
+
+              if (newLang === 'de') {
+                // Сначала используем существующий нормализатор для известных языков,
+                // затем переводим стабильные русские названия дней на немецкие.
+                originalRetranslateVisitFormWeekdays(oldLang, 'ru');
+                (state.servicePlan || []).forEach((day) => {
+                  if (deDays[day.label]) day.label = deDays[day.label];
+                });
+                return;
+              }
+
+              if (oldLang === 'de') {
+                (state.servicePlan || []).forEach((day) => {
+                  if (ruDays[day.label]) day.label = ruDays[day.label];
+                });
+                originalRetranslateVisitFormWeekdays('ru', newLang);
+                return;
+              }
+
+              originalRetranslateVisitFormWeekdays(oldLang, newLang);
+            };
+          }
+
+          const originalRenderVisitFormLists = app.ui.renderVisitFormLists?.bind(app.ui);
+          if (originalRenderVisitFormLists) {
+            app.ui.renderVisitFormLists = function () {
+              const result = originalRenderVisitFormLists();
+              if (app.state.visitFormData?.language === 'de') {
+                deVisitFormTranslateDom(app.els.vfMeetingsList);
+                deVisitFormTranslateDom(app.els.vfServiceDaysList);
+                deVisitFormTranslateDom(app.els.vfPastoralList);
+                deVisitFormTranslateDom(app.els.vfMealsList);
+              }
+              return result;
+            };
+          }
+
+          const originalRenderVisitFormLanguageReminder = app.ui.renderVisitFormLanguageReminder?.bind(app.ui);
+          if (originalRenderVisitFormLanguageReminder) {
+            app.ui.renderVisitFormLanguageReminder = function () {
+              const lang = app.state.visitFormData?.language || 'ru';
+              const interfaceLang = app.state.app?.settings?.language || 'ru';
+              if (lang === 'de' || interfaceLang === 'de') {
+                if (!app.els.vfLanguageReminder) return;
+                const langName = DE_NATIVE_LANG_NAMES[lang] || lang;
+                app.els.vfLanguageReminder.innerHTML = app.utils.t('vf_language_note', {
+                  lang: app.utils.escapeHtml(langName)
+                });
+                return;
+              }
+              return originalRenderVisitFormLanguageReminder();
+            };
+          }
+
+          const originalBuildVisitPdfDoc = app.ui.buildVisitPdfDoc?.bind(app.ui);
+          if (originalBuildVisitPdfDoc) {
+            app.ui.buildVisitPdfDoc = function () {
+              const state = app.state.visitFormData;
+              if (state?.language !== 'de') return originalBuildVisitPdfDoc();
+              if (typeof window.PdfGenerator === 'undefined' || !window.jspdf) {
+                app.utils.toast(app.utils.t('pdf_not_loaded'));
+                return null;
+              }
+              return window.PdfGenerator.generate(state, DE_VPI);
+            };
+          }
+
+          const originalOpenLetterModal = app.ui.openLetterModal?.bind(app.ui);
+          if (originalOpenLetterModal) {
+            app.ui.openLetterModal = function (itemId) {
+              const result = originalOpenLetterModal(itemId);
+              const entry = app.state.app.entries.find((e) => e.id === app.state.letterEntryId);
+              const event = entry ? app.data.getEventById(entry.eventId) : null;
+              const lang = event?.formLanguage || app.shared.docLang() || '';
+              if (entry && event && lang === 'de') {
+                const suffix = deLetterSuffix(app, event.visitType);
+                if (app.els.letterEmailBodyInput && !entry.emailBody) {
+                  app.els.letterEmailBodyInput.value = deSubstitute(app, DE_EMAIL_BODY_TEMPLATES[suffix], entry, event);
+                }
+                if (app.els.letterSubjectInput && !entry.subject && app.ui.buildLetterSubject) {
+                  app.els.letterSubjectInput.value = app.ui.buildLetterSubject(entry, event);
+                }
+              }
+              return result;
+            };
+          }
+
+          const originalBuildLetterPdfDoc = app.ui.buildLetterPdfDoc?.bind(app.ui);
+          if (originalBuildLetterPdfDoc) {
+            app.ui.buildLetterPdfDoc = function (entry, event, draftOverride) {
+              const lang = event?.formLanguage || app.shared.docLang() || '';
+              if (lang !== 'de') return originalBuildLetterPdfDoc(entry, event, draftOverride);
+              return buildGermanLetterPdf(app, entry, event, draftOverride);
+            };
+          }
+
+          // Кнопка «сбросить текст e-mail к стандартному» в app.js знает только
+          // старые четыре языка. Для de перехватываем её в capture-фазе после init().
+          setTimeout(() => {
+            const btn = app.els.letterEmailBodyResetToDefaultBtn;
+            if (!btn || btn.dataset.deDocumentResetInstalled === '1') return;
+            btn.dataset.deDocumentResetInstalled = '1';
+            btn.addEventListener('click', (eventClick) => {
+              const entry = app.state.app.entries.find((e) => e.id === app.state.letterEntryId);
+              const event = entry ? app.data.getEventById(entry.eventId) : null;
+              const lang = event?.formLanguage || app.shared.docLang() || '';
+              if (!entry || !event || lang !== 'de') return;
+              eventClick.preventDefault();
+              eventClick.stopImmediatePropagation();
+              const suffix = deLetterSuffix(app, event.visitType);
+              const fresh = deSubstitute(app, DE_EMAIL_BODY_TEMPLATES[suffix], entry, event);
+              if (app.els.letterEmailBodyInput) app.els.letterEmailBodyInput.value = fresh;
+              entry.emailBody = fresh;
+              app.store.save();
+              app.utils.toast(app.utils.t('letter_reset_done'));
+            }, true);
+          }, 0);
+        }
+
+
+        if (app && app.ui) {
+          installVisibleI18nAudit(app);
+        }
+
+      } finally {
+        Object.defineProperty(window, 'App', {
+          value: app,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
+      }
+    }
+  });
+})();

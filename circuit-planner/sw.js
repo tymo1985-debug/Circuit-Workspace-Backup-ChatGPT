@@ -1,7 +1,7 @@
 // Service Worker for Service Year Planner
 // Auto-update app shell without manual VERSION bumps.
-// Step 23: German interface bootstrap lives in js/pwa.js; changing this worker
-// forces a fresh install so the updated pre-app bootstrap is precached immediately.
+// Step 26: localization runtime lives in i18n/runtime.js; changing this worker
+// forces a fresh install so both the loader and runtime are precached immediately.
 // index.html / app.js / manifest / sw.js -> network-first
 // images/fonts -> cache-first
 // everything else -> stale-while-revalidate
@@ -30,6 +30,7 @@ const APP_SHELL_URLS = [
   '../shared/doclang.js',
   '../shared/i18n/common.js',
   './i18n/dict.js',
+  './i18n/runtime.js',
   '../shared/fonts/roboto-latin-400-normal.woff2',
   '../shared/fonts/roboto-latin-500-normal.woff2',
   '../shared/fonts/roboto-cyrillic-400-normal.woff2',
