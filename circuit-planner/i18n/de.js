@@ -75,6 +75,7 @@
     'cp.visit_form_btn': '📋 Besuchsformular',
     'cp.more_actions': '⋯ Weitere Aktionen',
     'cp.generate_s302': '📋 S-302 erstellen',
+    'cp.generate_send_s302': '📋 S-302 erstellen und senden',
     'cp.meetings_schedule': 'Terminplan',
     'cp.pastoral_visits': 'Hirtenbesuche',
     'cp.meals': 'Mahlzeiten',

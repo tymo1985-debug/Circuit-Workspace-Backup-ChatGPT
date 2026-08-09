@@ -8,7 +8,7 @@
 
 const CACHE_STATIC = 'syp-static';
 const CACHE_RUNTIME = 'syp-runtime';
-// Step 38: next-visit indicator lives inside the calendar toolbar, not the fixed topbar.
+// Step 39: S-302 reminder actions use native i18n; the bridge has one renderer left.
 const APP_SHELL_URLS = [
   './',
   './?source=pwa',

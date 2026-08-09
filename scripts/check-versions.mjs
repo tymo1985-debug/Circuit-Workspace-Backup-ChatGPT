@@ -124,6 +124,11 @@ if (!(calendarToolbarTitleAt >= 0 && nextVisitPillAt > calendarToolbarTitleAt &&
   errors.push(`${files.plannerHtml}: nextVisitPill должен находиться внутри заголовка calendar-toolbar`);
 }
 
+// Step 39 guard: reminder actions must use the normal dictionary directly.
+if (source.planner.includes('>📋 Сформировать и отправить S-302</button>')) {
+  errors.push(`${files.planner}: окно напоминаний содержит legacy-текст действия S-302`);
+}
+
 const runtimeVersionWrite = /\b(?:App|app)\.config\.version\s*=(?!=)/g;
 for (const file of plannerJsFiles) {
   if (file === files.planner) continue;

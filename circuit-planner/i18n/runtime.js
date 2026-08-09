@@ -3,7 +3,7 @@
  *
  * Step 33: словарь legacy-ключей и точечный bridge объединены в одном маленьком
  * модуле. Отдельный i18n/audit.js больше не нужен. Bridge запускается только
- * после двух оставшихся legacy-рендеров старого app.js и при смене языка.
+ * после единственного оставшегося legacy-рендера старого app.js и при смене языка.
  */
 (function () {
   'use strict';
@@ -13,23 +13,18 @@
 
   const AUDIT_I18N = {
     ru: {
-      'cp.audit.generate_send_s302': '📋 Сформировать и отправить S-302',
       'cp.audit.day': 'День',
     },
     uk: {
-      'cp.audit.generate_send_s302': '📋 Сформувати й надіслати S-302',
       'cp.audit.day': 'День',
     },
     en: {
-      'cp.audit.generate_send_s302': '📋 Generate and send S-302',
       'cp.audit.day': 'Day',
     },
     pl: {
-      'cp.audit.generate_send_s302': '📋 Utwórz i wyślij S-302',
       'cp.audit.day': 'Dzień',
     },
     de: {
-      'cp.audit.generate_send_s302': '📋 S-302 erstellen und senden',
       'cp.audit.day': 'Tag',
     },
   };
@@ -42,8 +37,6 @@
 
   function installLegacyTextBridge(app) {
     const legacyTextKeys = new Map([
-      ['📋 Сформировать и отправить S-302', 'audit.generate_send_s302'],
-      ['Сформировать и отправить S-302', 'audit.generate_send_s302'],
       ['Тип', 'type'],
       ['День', 'audit.day'],
     ]);
@@ -81,10 +74,7 @@
       app.els?.vfMealsList,
     ].filter(Boolean);
 
-    const allRoots = () => [
-      app.els?.remindersModalList,
-      ...visitRoots(),
-    ].filter(Boolean);
+    const allRoots = visitRoots;
 
     const scanSoon = (roots) => {
       const run = () => roots().filter(Boolean).forEach(scanText);
@@ -105,7 +95,6 @@
       app.ui[name] = wrapped;
     };
 
-    wrapRenderer('renderRemindersModal', () => [app.els?.remindersModalList]);
     wrapRenderer('renderVisitFormLists', visitRoots);
 
     setTimeout(() => allRoots().forEach(scanText), 0);

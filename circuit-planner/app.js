@@ -142,7 +142,7 @@
     config: {
       // Single source of truth for the displayed/stored app version — bump this on
       // every meaningful update so the version badge always reflects what's actually live.
-      version: '9.61.2',
+      version: '9.61.3',
       // NOTE: do NOT change this to match the app version — it is the localStorage key.
       // Changing it will make existing users lose all their saved data on next load.
       storageKey: 'service-year-planner-v9-4-2',
@@ -2944,7 +2944,7 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
         }
         App.els.remindersModalList.innerHTML = items.map((item) => {
           const dayLabel = item.daysUntil < 0 ? `<span class="flag-badge" style="background:#b91c1c">${App.utils.t('reminders_overdue')}</span>` : `<span class="small">${App.utils.t('reminders_days_left', { days: item.daysUntil })}</span>`;
-          const s302Btn = item.needsS302 ? `<button class="md-btn md-btn-danger md-state-layer" type="button" data-mark-reminder="s302" data-entry-id="${App.utils.escapeAttr(item.id)}">${App.utils.t('reminders_mark_s302')}</button><button class="md-btn md-btn-filled md-state-layer" type="button" data-send-s302="${App.utils.escapeAttr(item.id)}">📋 Сформировать и отправить S-302</button>` : '';
+          const s302Btn = item.needsS302 ? `<button class="md-btn md-btn-danger md-state-layer" type="button" data-mark-reminder="s302" data-entry-id="${App.utils.escapeAttr(item.id)}">${App.utils.t('reminders_mark_s302')}</button><button class="md-btn md-btn-filled md-state-layer" type="button" data-send-s302="${App.utils.escapeAttr(item.id)}">${App.utils.t('generate_send_s302')}</button>` : '';
           const letterBtn = item.needsLetter ? `<button class="md-btn md-btn-outlined md-state-layer" type="button" data-mark-reminder="letter" data-entry-id="${App.utils.escapeAttr(item.id)}">${App.utils.t('reminders_mark_letter')}</button>` : '';
           return `<div class="md-card" style="padding:14px">
             <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap">
