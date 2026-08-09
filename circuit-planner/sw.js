@@ -8,7 +8,7 @@
 
 const CACHE_STATIC = 'syp-static';
 const CACHE_RUNTIME = 'syp-runtime';
-// Step 35: pre-init i18n uses ordinary defer scripts; synchronous XHR is gone.
+// Step 36: calendar topbar divider and responsive alignment polished.
 const APP_SHELL_URLS = [
   './',
   './?source=pwa',

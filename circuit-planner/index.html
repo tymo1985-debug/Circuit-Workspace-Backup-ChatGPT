@@ -241,12 +241,13 @@ html[data-module="circuit-planner"] .nav-btn.md-sidenav__item.active{color:var(-
 html[data-module="circuit-planner"] .summary{background:var(--md-surface-container);color:var(--md-on-surface);border:1px solid var(--md-outline-variant)}
 html[data-module="circuit-planner"] .main{padding:0 var(--cw-space-4) var(--cw-space-6)}
 html[data-module="circuit-planner"] .topbar.md-topbar-v2{margin:0 calc(-1 * var(--cw-space-4)) var(--cw-space-3);padding-inline:var(--cw-space-4)}
+html[data-module="circuit-planner"] .topbar.md-topbar-v2::after{display:none}
 html[data-module="circuit-planner"] .topbar.md-topbar-v2 h2{font:var(--md-title-large);margin:0}
 html[data-module="circuit-planner"] .version-badge{border:0;background:transparent;padding:0}
 html[data-module="circuit-planner"] .calendar-toolbar.md-toolbar{background:var(--md-surface-container-low);border-bottom:1px solid var(--md-outline-variant)}
 html[data-module="circuit-planner"] .calendar-side.md-sheet{border:1px solid var(--md-outline-variant);box-shadow:var(--md-elevation-1)}
 html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-surface-container-high)}
-@media (max-width:1200px){html[data-module="circuit-planner"] .app{grid-template-columns:1fr}html[data-module="circuit-planner"] .sidebar.md-sidenav{position:fixed;left:calc(-1 * var(--sidebar-width) - 20px);top:0;bottom:0;width:var(--sidebar-width);z-index:2500}html[data-module="circuit-planner"] .app.menu-open .sidebar.md-sidenav{left:0}}
+@media (max-width:1200px){html[data-module="circuit-planner"] .app{grid-template-columns:1fr}html[data-module="circuit-planner"] .sidebar.md-sidenav{position:fixed;left:calc(-1 * var(--sidebar-width) - 20px);top:0;bottom:0;width:var(--sidebar-width);z-index:2500}html[data-module="circuit-planner"] .app.menu-open .sidebar.md-sidenav{left:0}html[data-module="circuit-planner"] .topbar.md-topbar-v2{margin-inline:-22px}}
 @media (max-width:680px){html[data-module="circuit-planner"] .main{padding:0 12px 92px!important}html[data-module="circuit-planner"] .topbar.md-topbar-v2{margin-inline:-12px;padding-inline:12px}}
 </style>
 <link rel="stylesheet" href="../shared/style.css">
