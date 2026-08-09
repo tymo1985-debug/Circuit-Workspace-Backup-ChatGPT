@@ -73,6 +73,8 @@
     'cp.not_a_visit': 'Kein Besuch (normaler Eintrag)',
     'cp.no_visit_type': '⚠️ Keine Besuchsart',
     'cp.visit_form_btn': '📋 Besuchsformular',
+    'cp.more_actions': '⋯ Weitere Aktionen',
+    'cp.generate_s302': '📋 S-302 erstellen',
     'cp.meetings_schedule': 'Terminplan',
     'cp.pastoral_visits': 'Hirtenbesuche',
     'cp.meals': 'Mahlzeiten',

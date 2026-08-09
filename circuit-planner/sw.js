@@ -8,7 +8,7 @@
 
 const CACHE_STATIC = 'syp-static';
 const CACHE_RUNTIME = 'syp-runtime';
-// Step 36: calendar topbar divider and responsive alignment polished.
+// Step 37: event-detail actions use native i18n keys instead of the legacy bridge.
 const APP_SHELL_URLS = [
   './',
   './?source=pwa',

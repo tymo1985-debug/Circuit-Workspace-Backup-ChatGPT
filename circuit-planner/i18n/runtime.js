@@ -3,7 +3,7 @@
  *
  * Step 33: словарь legacy-ключей и точечный bridge объединены в одном маленьком
  * модуле. Отдельный i18n/audit.js больше не нужен. Bridge запускается только
- * после трёх конкретных рендеров старого app.js и при смене языка.
+ * после двух оставшихся legacy-рендеров старого app.js и при смене языка.
  */
 (function () {
   'use strict';
@@ -13,32 +13,22 @@
 
   const AUDIT_I18N = {
     ru: {
-      'cp.audit.more_actions': '⋯ Ещё действия',
-      'cp.audit.generate_s302': '📋 Сформировать S-302',
       'cp.audit.generate_send_s302': '📋 Сформировать и отправить S-302',
       'cp.audit.day': 'День',
     },
     uk: {
-      'cp.audit.more_actions': '⋯ Інші дії',
-      'cp.audit.generate_s302': '📋 Сформувати S-302',
       'cp.audit.generate_send_s302': '📋 Сформувати й надіслати S-302',
       'cp.audit.day': 'День',
     },
     en: {
-      'cp.audit.more_actions': '⋯ More actions',
-      'cp.audit.generate_s302': '📋 Generate S-302',
       'cp.audit.generate_send_s302': '📋 Generate and send S-302',
       'cp.audit.day': 'Day',
     },
     pl: {
-      'cp.audit.more_actions': '⋯ Więcej działań',
-      'cp.audit.generate_s302': '📋 Utwórz S-302',
       'cp.audit.generate_send_s302': '📋 Utwórz i wyślij S-302',
       'cp.audit.day': 'Dzień',
     },
     de: {
-      'cp.audit.more_actions': '⋯ Weitere Aktionen',
-      'cp.audit.generate_s302': '📋 S-302 erstellen',
       'cp.audit.generate_send_s302': '📋 S-302 erstellen und senden',
       'cp.audit.day': 'Tag',
     },
@@ -52,12 +42,6 @@
 
   function installLegacyTextBridge(app) {
     const legacyTextKeys = new Map([
-      ['⋯ Ещё действия', 'audit.more_actions'],
-      ['Ещё действия', 'audit.more_actions'],
-      ['📋 Формуляр визита', 'visit_form_btn'],
-      ['Формуляр визита', 'visit_form_btn'],
-      ['📋 Сформировать S-302', 'audit.generate_s302'],
-      ['Сформировать S-302', 'audit.generate_s302'],
       ['📋 Сформировать и отправить S-302', 'audit.generate_send_s302'],
       ['Сформировать и отправить S-302', 'audit.generate_send_s302'],
       ['Тип', 'type'],
@@ -98,7 +82,6 @@
     ].filter(Boolean);
 
     const allRoots = () => [
-      app.els?.calendarSideDetails,
       app.els?.remindersModalList,
       ...visitRoots(),
     ].filter(Boolean);
@@ -122,7 +105,6 @@
       app.ui[name] = wrapped;
     };
 
-    wrapRenderer('renderCalendarDetails', () => [app.els?.calendarSideDetails]);
     wrapRenderer('renderRemindersModal', () => [app.els?.remindersModalList]);
     wrapRenderer('renderVisitFormLists', visitRoots);
 

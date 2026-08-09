@@ -106,6 +106,14 @@ if (/\bXMLHttpRequest\b/.test(source.plannerPwa) || /\.open\s*\(\s*['"]GET['"]\s
   errors.push(`${files.plannerPwa}: запрещён синхронный XHR в pre-init bootstrap`);
 }
 
+// Step 37 guard: event-detail actions must be translated at render time, not
+// repaired later by the legacy DOM text bridge.
+for (const legacyDetailText of ['<summary>⋯ Ещё действия</summary>', '>📋 Формуляр визита</button>', '>📋 Сформировать S-302</button>']) {
+  if (source.planner.includes(legacyDetailText)) {
+    errors.push(`${files.planner}: детали события содержат legacy-текст ${legacyDetailText}`);
+  }
+}
+
 const runtimeVersionWrite = /\b(?:App|app)\.config\.version\s*=(?!=)/g;
 for (const file of plannerJsFiles) {
   if (file === files.planner) continue;
