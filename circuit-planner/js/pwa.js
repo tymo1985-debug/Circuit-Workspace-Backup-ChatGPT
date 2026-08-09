@@ -1,7 +1,7 @@
 /**
  * Клиндарий — pre-app bootstrap + регистрация PWA.
  *
- * Step 34: pre-init модули выполняются синхронно через временный <script>, без indirect eval.
+ * Step 35: pre-init модули подключаются обычными defer-скриптами в index.html.
  * i18n/de.js отвечает за немецкий интерфейс; i18n/de-docs.js — за немецкие
  * документы; i18n/runtime.js — за компактный legacy i18n bridge.
  * app.js остаётся владельцем App и версии.
@@ -13,36 +13,6 @@
   window.CWKlindariyRegisterPreInitHook = function (hook) {
     if (typeof hook === 'function') preInitHooks.push(hook);
   };
-
-  function loadPreInitScript(relativeUrl, loadedFlag) {
-    if (loadedFlag && window[loadedFlag]) return;
-    const current = document.currentScript;
-    const base = current?.src || window.location.href;
-    const url = new URL(relativeUrl, base);
-    const request = new XMLHttpRequest();
-    request.open('GET', url.href, false);
-    request.send(null);
-    const ok = (request.status >= 200 && request.status < 300) || request.status === 0;
-    if (!ok || !request.responseText) {
-      throw new Error(`${relativeUrl} HTTP ${request.status || 'error'}`);
-    }
-    // Same-origin app-shell source only. Inline classic scripts execute immediately
-    // when appended, preserving the deterministic pre-init order without direct code evaluation.
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.textContent = `${request.responseText}
-//# sourceURL=${url.href}`;
-    document.head.appendChild(script);
-    script.remove();
-  }
-
-  try {
-    loadPreInitScript('../i18n/de.js', 'CWKlindariyGermanUiLoaded');
-    loadPreInitScript('../i18n/de-docs.js', 'CWKlindariyGermanDocumentsLoaded');
-    loadPreInitScript('../i18n/runtime.js', 'CWKlindariyAuditRuntimeLoaded');
-  } catch (error) {
-    console.error('Klindariy pre-init i18n failed to load', error);
-  }
 
   // app.js publishes its local const App as window.App immediately before App.init().
   // Keep exactly one interception point and let modules register small independent hooks.

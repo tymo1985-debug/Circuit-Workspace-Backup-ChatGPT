@@ -100,6 +100,12 @@ if (/\(\s*0\s*,\s*eval\s*\)\s*\(/.test(source.plannerPwa)) {
   errors.push(`${files.plannerPwa}: запрещён indirect eval в pre-init bootstrap`);
 }
 
+// Step 35 guard: pre-init modules are normal defer scripts. Synchronous XHR
+// blocks the main thread and must not return as a hidden script loader.
+if (/\bXMLHttpRequest\b/.test(source.plannerPwa) || /\.open\s*\(\s*['"]GET['"]\s*,[^)]*,\s*false\s*\)/s.test(source.plannerPwa)) {
+  errors.push(`${files.plannerPwa}: запрещён синхронный XHR в pre-init bootstrap`);
+}
+
 const runtimeVersionWrite = /\b(?:App|app)\.config\.version\s*=(?!=)/g;
 for (const file of plannerJsFiles) {
   if (file === files.planner) continue;
