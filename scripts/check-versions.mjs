@@ -7,6 +7,7 @@ const files = {
   congress: 'congress-project/service-worker.js',
   congressHtml: 'congress-project/index.html',
   planner: 'circuit-planner/app.js',
+  plannerPwa: 'circuit-planner/js/pwa.js',
   schoolApp: 'pioneer-school/js/app.js',
   schoolSw: 'pioneer-school/sw.js',
   appointments: 'appointments/sw.js',
@@ -93,6 +94,12 @@ if (/<title>[^<]*\bv\d+\.\d+(?:\.\d+)?[^<]*<\/title>/i.test(source.congressHtml)
 // application version. This catches the exact class of regression that caused
 // Step 24 to pass browser-side logic while failing the static release check.
 const plannerJsFiles = await walkJavascript('circuit-planner');
+
+// Step 34 guard: the old indirect-eval bootstrap must not return.
+if (/\(\s*0\s*,\s*eval\s*\)\s*\(/.test(source.plannerPwa)) {
+  errors.push(`${files.plannerPwa}: запрещён indirect eval в pre-init bootstrap`);
+}
+
 const runtimeVersionWrite = /\b(?:App|app)\.config\.version\s*=(?!=)/g;
 for (const file of plannerJsFiles) {
   if (file === files.planner) continue;

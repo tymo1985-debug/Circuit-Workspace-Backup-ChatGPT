@@ -1,7 +1,7 @@
 /**
  * Клиндарий — pre-app bootstrap + регистрация PWA.
  *
- * Step 28: один общий pre-init hook-механизм подключает независимые i18n-модули.
+ * Step 34: pre-init модули выполняются синхронно через временный <script>, без indirect eval.
  * i18n/de.js отвечает за немецкий интерфейс; i18n/de-docs.js — за немецкие
  * документы; i18n/runtime.js — за компактный legacy i18n bridge.
  * app.js остаётся владельцем App и версии.
@@ -26,9 +26,14 @@
     if (!ok || !request.responseText) {
       throw new Error(`${relativeUrl} HTTP ${request.status || 'error'}`);
     }
-    // Same-origin app-shell source only; executed before app.js in deterministic order.
-    (0, eval)(`${request.responseText}
-//# sourceURL=${url.href}`);
+    // Same-origin app-shell source only. Inline classic scripts execute immediately
+    // when appended, preserving the deterministic pre-init order without direct code evaluation.
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.textContent = `${request.responseText}
+//# sourceURL=${url.href}`;
+    document.head.appendChild(script);
+    script.remove();
   }
 
   try {

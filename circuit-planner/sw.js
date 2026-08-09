@@ -8,6 +8,7 @@
 
 const CACHE_STATIC = 'syp-static';
 const CACHE_RUNTIME = 'syp-runtime';
+// Step 34: indirect eval removed from pre-init bootstrap.
 const APP_SHELL_URLS = [
   './',
   './?source=pwa',
