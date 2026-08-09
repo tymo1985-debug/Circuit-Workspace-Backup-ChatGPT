@@ -3,7 +3,7 @@
  *
  * Step 28: один общий pre-init hook-механизм подключает независимые i18n-модули.
  * i18n/de.js отвечает за немецкий интерфейс; i18n/de-docs.js — за немецкие
- * документы; i18n/audit.js — за legacy-ключи; i18n/runtime.js — только за DOM-аудит.
+ * документы; i18n/runtime.js — за компактный legacy i18n bridge.
  * app.js остаётся владельцем App и версии.
  */
 (function () {
@@ -34,7 +34,6 @@
   try {
     loadPreInitScript('../i18n/de.js', 'CWKlindariyGermanUiLoaded');
     loadPreInitScript('../i18n/de-docs.js', 'CWKlindariyGermanDocumentsLoaded');
-    loadPreInitScript('../i18n/audit.js', 'CWKlindariyAuditI18nLoaded');
     loadPreInitScript('../i18n/runtime.js', 'CWKlindariyAuditRuntimeLoaded');
   } catch (error) {
     console.error('Klindariy pre-init i18n failed to load', error);

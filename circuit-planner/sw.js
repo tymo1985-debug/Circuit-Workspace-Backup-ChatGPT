@@ -32,7 +32,6 @@ const APP_SHELL_URLS = [
   './i18n/dict.js',
   './i18n/de.js',
   './i18n/de-docs.js',
-  './i18n/audit.js',
   './i18n/runtime.js',
   '../shared/fonts/roboto-latin-400-normal.woff2',
   '../shared/fonts/roboto-latin-500-normal.woff2',
