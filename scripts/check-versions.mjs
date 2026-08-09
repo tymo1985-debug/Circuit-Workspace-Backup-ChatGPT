@@ -7,6 +7,7 @@ const files = {
   congress: 'congress-project/service-worker.js',
   congressHtml: 'congress-project/index.html',
   planner: 'circuit-planner/app.js',
+  plannerHtml: 'circuit-planner/index.html',
   plannerPwa: 'circuit-planner/js/pwa.js',
   schoolApp: 'pioneer-school/js/app.js',
   schoolSw: 'pioneer-school/sw.js',
@@ -112,6 +113,15 @@ for (const legacyDetailText of ['<summary>⋯ Ещё действия</summary>'
   if (source.planner.includes(legacyDetailText)) {
     errors.push(`${files.planner}: детали события содержат legacy-текст ${legacyDetailText}`);
   }
+}
+
+// Step 38 guard: the next-visit chip must stay inside the calendar toolbar.
+// In the fixed-height topbar it overflows and covers the calendar on narrow screens.
+const calendarToolbarTitleAt = source.plannerHtml.indexOf('<div class="calendar-toolbar-title">');
+const nextVisitPillAt = source.plannerHtml.indexOf('id="nextVisitPill"');
+const calendarControlsAt = source.plannerHtml.indexOf('<div class="calendar-controls">');
+if (!(calendarToolbarTitleAt >= 0 && nextVisitPillAt > calendarToolbarTitleAt && nextVisitPillAt < calendarControlsAt)) {
+  errors.push(`${files.plannerHtml}: nextVisitPill должен находиться внутри заголовка calendar-toolbar`);
 }
 
 const runtimeVersionWrite = /\b(?:App|app)\.config\.version\s*=(?!=)/g;

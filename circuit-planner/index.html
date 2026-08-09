@@ -277,7 +277,6 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
           <div class="topbar-title-block md-topbar-v2__titles">
             <div data-i18n="cp.version_label" class="version-badge">Версия: …</div>
             <h2 data-i18n="cp.screen_calendar" id="screenTitle" class="md-topbar-v2__title">Календарь</h2>
-            <button id="nextVisitPill" class="md-chip md-state-layer" type="button" style="display:none;margin:6px 0;font-size:14px;padding:7px 14px;max-width:100%;align-items:center;gap:6px"><span id="nextVisitPillName" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0"></span><span id="nextVisitPillDate" style="white-space:nowrap;flex-shrink:0"></span></button>
             <p id="screenSubtitle" class="md-topbar-v2__sub"></p>
           </div>
         </div>
@@ -286,7 +285,7 @@ html[data-module="circuit-planner"] .modal-card.md-dialog{background:var(--md-su
         <div class="calendar-layout" id="calendarLayout">
           <div class="calendar-shell">
             <div class="calendar-toolbar md-toolbar">
-              <div class="calendar-toolbar-title"><div class="small" id="calendarServiceYearLabel"></div><h3 class="calendar-title" id="monthLabel"></h3><div class="calendar-sub" id="calendarRangeLabel"></div></div>
+              <div class="calendar-toolbar-title"><div class="small" id="calendarServiceYearLabel"></div><h3 class="calendar-title" id="monthLabel"></h3><div class="calendar-sub" id="calendarRangeLabel"></div><button id="nextVisitPill" class="md-chip md-state-layer" type="button" style="display:none;margin:10px 0 0;font-size:14px;padding:7px 14px;max-width:100%;align-items:center;gap:6px"><span id="nextVisitPillName" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0"></span><span id="nextVisitPillDate" style="white-space:nowrap;flex-shrink:0"></span></button></div>
               <div class="calendar-controls">
                 <div class="calendar-nav"><button class="icon-btn md-icon-btn md-state-layer" id="prevMonthBtn" type="button" aria-label="Предыдущий месяц" data-i18n-aria-label="cp.a_prev_month">‹</button><button data-i18n="cp.countdown_today" class="md-chip md-state-layer" id="todayMonthBtn" type="button">Сегодня</button><button class="icon-btn md-icon-btn md-state-layer" id="nextMonthBtn" type="button" aria-label="Следующий месяц" data-i18n-aria-label="cp.a_next_month">›</button></div>
                 <details class="toolbar-more">

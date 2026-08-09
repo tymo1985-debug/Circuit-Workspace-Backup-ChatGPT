@@ -8,7 +8,7 @@
 
 const CACHE_STATIC = 'syp-static';
 const CACHE_RUNTIME = 'syp-runtime';
-// Step 37: event-detail actions use native i18n keys instead of the legacy bridge.
+// Step 38: next-visit indicator lives inside the calendar toolbar, not the fixed topbar.
 const APP_SHELL_URLS = [
   './',
   './?source=pwa',
