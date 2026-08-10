@@ -1,14 +1,14 @@
 // Service Worker for Service Year Planner
 // Auto-update app shell without manual VERSION bumps.
-// Step 26: localization runtime lives in i18n/runtime.js; changing this worker
-// forces a fresh install so both the loader and runtime are precached immediately.
+// Step 40: the temporary i18n runtime is gone; changing this worker forces a
+// fresh install so clients receive the native visit-form labels immediately.
 // index.html / app.js / manifest / sw.js -> network-first
 // images/fonts -> cache-first
 // everything else -> stale-while-revalidate
 
 const CACHE_STATIC = 'syp-static';
 const CACHE_RUNTIME = 'syp-runtime';
-// Step 39: S-302 reminder actions use native i18n; the bridge has one renderer left.
+// Step 40: legacy i18n bridge removed.
 const APP_SHELL_URLS = [
   './',
   './?source=pwa',
@@ -33,7 +33,6 @@ const APP_SHELL_URLS = [
   './i18n/dict.js',
   './i18n/de.js',
   './i18n/de-docs.js',
-  './i18n/runtime.js',
   '../shared/fonts/roboto-latin-400-normal.woff2',
   '../shared/fonts/roboto-latin-500-normal.woff2',
   '../shared/fonts/roboto-cyrillic-400-normal.woff2',

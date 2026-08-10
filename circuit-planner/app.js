@@ -142,7 +142,7 @@
     config: {
       // Single source of truth for the displayed/stored app version — bump this on
       // every meaningful update so the version badge always reflects what's actually live.
-      version: '9.61.3',
+      version: '9.61.4',
       // NOTE: do NOT change this to match the app version — it is the localStorage key.
       // Changing it will make existing users lose all their saved data on next load.
       storageKey: 'service-year-planner-v9-4-2',
@@ -2547,8 +2547,8 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
         if (App.els.vfMeetingsList) App.els.vfMeetingsList.innerHTML = state.meetings.length ? state.meetings.map((m) => `
           <div class="md-card" style="padding:10px;box-shadow:none" data-row-id="${escA(m.id)}" data-row-kind="meeting">
             <div class="form-grid">
-              <label><span class="small">Тип</span><select data-field="type">${vpi.MEETING_TYPES.map((mt) => `<option value="${mt}" ${m.type === mt ? 'selected' : ''}>${esc(vpi.t(mt))}</option>`).join('')}</select></label>
-              <label><span class="small">День</span><input data-field="day" type="text" value="${escA(m.day)}" /></label>
+              <label><span class="small">${App.utils.t('type')}</span><select data-field="type">${vpi.MEETING_TYPES.map((mt) => `<option value="${mt}" ${m.type === mt ? 'selected' : ''}>${esc(vpi.t(mt))}</option>`).join('')}</select></label>
+              <label><span class="small">${App.utils.t('day')}</span><input data-field="day" type="text" value="${escA(m.day)}" /></label>
               <label><span class="small">${App.utils.t('vf_time')}</span><input data-field="time" type="text" value="${escA(m.time)}" /></label>
               <label><span class="small">${App.utils.t('vf_place')}</span><input data-field="place" type="text" value="${escA(m.place)}" /></label>
             </div>
@@ -2587,7 +2587,7 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
             <div class="md-card" style="padding:10px;box-shadow:none" data-row-id="${escA(p.id)}" data-row-kind="pastoral">
               <div class="form-grid">
                 <label><span class="small">Имя</span><input data-field="name" type="text" value="${escA(p.name)}" /></label>
-                <label><span class="small">День</span><input data-field="day" type="text" value="${escA(p.day)}" /></label>
+                <label><span class="small">${App.utils.t('day')}</span><input data-field="day" type="text" value="${escA(p.day)}" /></label>
                 <label><span class="small">${App.utils.t('vf_time')}</span><input data-field="time" type="text" value="${escA(p.time)}" /></label>
                 <label><span class="small">${App.utils.t('vf_partner_label')}</span><input data-field="partner" type="text" placeholder="${escA(App.utils.t('vf_partner_ph'))}" value="${escA(p.partner)}" /></label>
                 <label style="grid-column:1 / -1"><span class="small">Причина</span><input data-field="reason" type="text" value="${escA(p.reason)}" /></label>
@@ -2600,7 +2600,7 @@ document.querySelectorAll('.sy-day[data-add-date]').forEach((btn) => {
         if (App.els.vfMealsList) App.els.vfMealsList.innerHTML = state.meals.length ? state.meals.map((m) => `
           <div class="md-card" style="padding:10px;box-shadow:none" data-row-id="${escA(m.id)}" data-row-kind="meal">
             <div class="form-grid">
-              <label><span class="small">День</span><select data-field="day"><option value=""></option>${vpi.MEAL_DAY_KEYS.map((dk) => { const label = vpi.t(dk); return `<option value="${escA(label)}" ${m.day === label ? 'selected' : ''}>${esc(label)}</option>`; }).join('')}</select></label>
+              <label><span class="small">${App.utils.t('day')}</span><select data-field="day"><option value=""></option>${vpi.MEAL_DAY_KEYS.map((dk) => { const label = vpi.t(dk); return `<option value="${escA(label)}" ${m.day === label ? 'selected' : ''}>${esc(label)}</option>`; }).join('')}</select></label>
               <label><span class="small">${App.utils.t('vf_time')}</span><select data-field="time"><option value=""></option>${MEAL_TIME_OPTIONS.map((tm) => `<option value="${tm}" ${m.time === tm ? 'selected' : ''}>${tm}</option>`).join('')}</select></label>
               <label><span class="small">${App.utils.t('vf_place')}</span><input data-field="place" type="text" value="${escA(m.place)}" /></label>
               <label><span class="small">${App.utils.t('vf_host')}</span><input data-field="host" type="text" value="${escA(m.host)}" /></label>

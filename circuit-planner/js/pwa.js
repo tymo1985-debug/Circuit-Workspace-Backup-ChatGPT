@@ -3,7 +3,7 @@
  *
  * Step 35: pre-init модули подключаются обычными defer-скриптами в index.html.
  * i18n/de.js отвечает за немецкий интерфейс; i18n/de-docs.js — за немецкие
- * документы; i18n/runtime.js — за компактный legacy i18n bridge.
+ * документы. Временный legacy i18n bridge удалён в Step 40.
  * app.js остаётся владельцем App и версии.
  */
 (function () {

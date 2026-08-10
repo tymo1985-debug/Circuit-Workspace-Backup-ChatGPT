@@ -415,6 +415,7 @@
     'cp.apple_calendar': 'Apple / .ics',
     'cp.edit': 'Bearbeiten',
     'cp.type': 'Typ',
+    'cp.day': 'Tag',
     'cp.type_week': 'Woche',
     'cp.type_entry': 'Eintrag',
     'cp.template': 'Versammlung',

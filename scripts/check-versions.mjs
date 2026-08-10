@@ -9,6 +9,7 @@ const files = {
   planner: 'circuit-planner/app.js',
   plannerHtml: 'circuit-planner/index.html',
   plannerPwa: 'circuit-planner/js/pwa.js',
+  plannerSw: 'circuit-planner/sw.js',
   schoolApp: 'pioneer-school/js/app.js',
   schoolSw: 'pioneer-school/sw.js',
   appointments: 'appointments/sw.js',
@@ -127,6 +128,21 @@ if (!(calendarToolbarTitleAt >= 0 && nextVisitPillAt > calendarToolbarTitleAt &&
 // Step 39 guard: reminder actions must use the normal dictionary directly.
 if (source.planner.includes('>📋 Сформировать и отправить S-302</button>')) {
   errors.push(`${files.planner}: окно напоминаний содержит legacy-текст действия S-302`);
+}
+
+// Step 40 guard: the temporary visit-form DOM bridge has been fully removed.
+const plannerI18nEntries = await readdir('circuit-planner/i18n');
+if (plannerI18nEntries.includes('runtime.js')) {
+  errors.push('circuit-planner/i18n/runtime.js: временный legacy bridge должен быть удалён');
+}
+for (const [label, text] of [
+  [files.plannerHtml, source.plannerHtml],
+  [files.plannerPwa, source.plannerPwa],
+  [files.plannerSw, source.plannerSw],
+]) {
+  if (/i18n\/runtime\.js/.test(text)) {
+    errors.push(`${label}: не должно быть ссылки на удалённый i18n/runtime.js`);
+  }
 }
 
 const runtimeVersionWrite = /\b(?:App|app)\.config\.version\s*=(?!=)/g;
